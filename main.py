@@ -26,7 +26,7 @@ class MyGame(arcade.Window):
         self.obstacle_list = None
         self.closest_obstacle = None
         self.AI_mode = False
-        self.current_state = GAME_RUNNING
+        self.current_state = MENU
 
     def setup(self):
         """Set up the game and initialize the variables. """
@@ -46,17 +46,30 @@ class MyGame(arcade.Window):
 
             self.obstacle_list.append(obstacle)
 
+    def draw_menu(self):
+        """Draw "MENU"."""
+
+        arcade.draw_rectangle_filled(int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5), 400, 200, arcade.color.BLACK)
+        arcade.draw_text("Choose game mode: ", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) + 50,
+                         arcade.color.WHITE, 24, align="center", anchor_x="center", anchor_y="center")
+        arcade.draw_text("A. Autopilot", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5),
+                         arcade.color.WHITE, 24, align="center", anchor_x="center", anchor_y="center")
+        arcade.draw_text("B. Player", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 50,
+                         arcade.color.WHITE, 24, align="center", anchor_x="center", anchor_y="center")
+
     def draw_game_over(self):
         """
         Draw "Game over" across the screen.
         """
-        arcade.draw_rectangle_filled(int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5), 400, 200, arcade.color.BLACK)
-        arcade.draw_text("Game Over", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) + 50,
+        arcade.draw_rectangle_filled(int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5), 400, 250, arcade.color.BLACK)
+        arcade.draw_text("Game Over", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) + 60,
                          arcade.color.WHITE, 54, align="center", anchor_x="center", anchor_y="center")
         arcade.draw_text("Click SPACE to restart", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5),
-                         arcade.color.WHITE, 24, align="center", anchor_x="center", anchor_y="center")
-        arcade.draw_text(f"Score: {self.ship.points_when_died}", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 50,
-                         arcade.color.WHITE, 14, align="center", anchor_x="center", anchor_y="center")
+                         arcade.color.WHITE, 16, align="center", anchor_x="center", anchor_y="center")
+        arcade.draw_text("Click ENTER to return to MENU", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 40,
+                         arcade.color.WHITE, 16, align="center", anchor_x="center", anchor_y="center")
+        arcade.draw_text(f"Score: {self.ship.points_when_died}", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 80,
+                         arcade.color.WHITE, 16, align="center", anchor_x="center", anchor_y="center")
 
     def draw_game(self):
         """
@@ -110,11 +123,13 @@ class MyGame(arcade.Window):
         """ Called whenever we need to draw the window. """
         arcade.start_render()
 
+        if self.current_state == MENU:
+            self.draw_menu()
+
         if self.current_state == GAME_RUNNING:
             self.draw_game()
 
-        else:
-            # self.draw_game()
+        if self.current_state == GAME_OVER:
             self.draw_game()
             self.draw_game_over()
 
@@ -130,12 +145,18 @@ class MyGame(arcade.Window):
     def update(self, delta_time):
 
         if self.current_state == GAME_RUNNING:
-            prev_obst = self.closest_obstacle
-            self.ident_clos_obstacle()
-            curr_obst = self.closest_obstacle
-            if not prev_obst == curr_obst:
+
+            # Passing obstacles
+            prev_obst = self.closest_obstacle   # passed obstacle
+            self.ident_clos_obstacle()          # identifying new obstacle
+            curr_obst = self.closest_obstacle   # assigning new obstacle
+            if not prev_obst == curr_obst:      # if obstacle changed, add +1 point
                 self.score += 1
-            self.ship.update()
+
+            # Ship update
+            self.ship.update(AI_state=self.AI_mode,
+                             gap_x1=self.obstacle_list[self.closest_obstacle].gap_x1,
+                             gap_x2=self.obstacle_list[self.closest_obstacle].gap_x1)
 
             for obstacle in self.obstacle_list:
                 obstacle.update(delta_time)
@@ -145,25 +166,38 @@ class MyGame(arcade.Window):
     def on_key_press(self, key, modifiers):
         """ Called whenever the user presses a key. """
 
+        if self.current_state == MENU:
+            if key == arcade.key.A:
+                self.current_state = GAME_RUNNING
+                self.AI_mode = True
+                self.setup()
+            if key == arcade.key.B:
+                self.current_state = GAME_RUNNING
+                self.AI_mode = False
+                self.setup()
+
         if self.current_state == GAME_RUNNING:
-            if not self.AI_mode:
-                if self.ship.alive:
+            if self.ship.alive:
+                if not self.AI_mode:
                     if key == arcade.key.LEFT:
                         self.ship.change_x = -MOVEMENT_SPEED
                     elif key == arcade.key.RIGHT:
                         self.ship.change_x = MOVEMENT_SPEED
 
-        else:
+        if self.current_state == GAME_OVER:
             if key == arcade.key.SPACE:
                 self.setup()
                 self.current_state = GAME_RUNNING
 
+            if key == arcade.key.ENTER:
+                self.setup()
+                self.current_state = MENU
+
     def on_key_release(self, key, modifiers):
         """ Called whenever a user releases a key. """
-        if not self.AI_mode:
-            if self.ship.alive:
-                if key == arcade.key.LEFT or key == arcade.key.RIGHT:
-                    self.ship.change_x = 0
+        if self.ship.alive:
+            if key == arcade.key.LEFT or key == arcade.key.RIGHT:
+                self.ship.change_x = 0
 
 
 def main():

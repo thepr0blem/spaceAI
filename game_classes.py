@@ -53,6 +53,8 @@ class SpaceShip:
         self.center_y = self.position_y + 20
         self.alive = True
         self.points_when_died = 0
+        self.pilot = Pilot()
+        self.AI = False
 
     def draw(self):
         """ Draw the spaceship with the instance variables we have. """
@@ -64,11 +66,20 @@ class SpaceShip:
 
         arcade.draw_point(self.position_x, self.position_y + 20, arcade.color.BLACK, 5)
 
-    def update(self):
-        # Move the ball
-        self.position_x += self.change_x
+    def update(self, AI_state, gap_x1, gap_x2):
 
-        # See if the ball hit the edge of the screen. If so, change direction
+        if not AI_state:
+            # Move left or right
+            self.position_x += self.change_x
+
+        if AI_state:
+            if self.pilot.decide(self.position_x, gap_x1, gap_x2) == 0:
+                self.position_x += 0
+            elif self.pilot.decide(self.position_x, gap_x1, gap_x2) == 1:
+                self.position_x += - MOVEMENT_SPEED
+            else: self.position_x += MOVEMENT_SPEED
+
+        # Check for collisions with screen "edges"
         if self.position_x < self.half_width:
             self.position_x = self.half_width
 
