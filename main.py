@@ -26,6 +26,7 @@ class MyGame(arcade.Window):
         self.obstacle_list = None
         self.closest_obstacle = None
         self.AI_mode = False
+        self.simulation_mode = False
         self.current_state = MENU
 
     def setup(self):
@@ -112,12 +113,19 @@ class MyGame(arcade.Window):
 
         if 0 <= self.ship.position_x <= closest_obstacle_x1 or closest_obstacle_x2 <= self.ship.position_x <= 640:
             if self.ship.center_y >= closest_obstacle_bottom_edge:
-                self.ship.alive = False
-                self.ship.color = arcade.color.RED
-                self.current_state = GAME_OVER
-                self.ship.points_when_died = self.score
-                for obstacle in self.obstacle_list:
-                    obstacle.is_active = False
+
+                if self.simulation_mode:
+                    self.ship.alive = False
+                    self.ship.position_y = -200
+                    self.ship.points_when_died = self.score
+
+                if not self.simulation_mode:
+                    self.ship.alive = False
+                    self.ship.color = arcade.color.RED
+                    self.current_state = GAME_OVER
+                    self.ship.points_when_died = self.score
+                    for obstacle in self.obstacle_list:
+                        obstacle.is_active = False
 
     def on_draw(self):
         """ Called whenever we need to draw the window. """

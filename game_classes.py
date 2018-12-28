@@ -45,6 +45,7 @@ class SpaceShip:
     def __init__(self, position_x, position_y, change_x, h_width, color):
 
         # Take the parameters of the init function above, and create instance variables out of them.
+
         self.position_x = position_x
         self.position_y = position_y
         self.change_x = change_x
@@ -77,7 +78,8 @@ class SpaceShip:
                 self.position_x += 0
             elif self.pilot.decide(self.position_x, gap_x1, gap_x2) == 1:
                 self.position_x += - MOVEMENT_SPEED
-            else: self.position_x += MOVEMENT_SPEED
+            else:
+                self.position_x += MOVEMENT_SPEED
 
         # Check for collisions with screen "edges"
         if self.position_x < self.half_width:
