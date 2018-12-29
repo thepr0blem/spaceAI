@@ -15,15 +15,19 @@ class Population:
 
     # TODO / concept:
     #   This is group of SpaceShip objects, which together with their pilots will be evolving as playing
-    #   .
-    #   Variables:
+    #   *Initialization: If memory of population is empty initalize random Pilots,
+    #                    else: take historical data and evolve population
+    #   *Variables:
+    #   - generation number
     #   - list of playing SpaceShip objects
     #   - list of dead Spaceship objects
+    #   - list of scores from previous generation
     #   .
-    #   Methods:
+    #   *Methods:
     #   - initialize with n Spaceships with random genotypes
     #   - evolve (selection, crossover, mutation)
     #   - restart (move dead to playing)
+    #   - save best genes to file
 
     pass
 
@@ -33,8 +37,8 @@ class Pilot:
 
         # Random initialization of weights for neural network using two arrays:
         # 1. Weights input -> hidden layer
-        # 2. Weights hidden layer -> output
         self.genotype_a = np.random.randn(8, 3)
+        # 2. Weights hidden layer -> output
         self.genotype_b = np.random.randn(3, 8)
 
         self.latest_score = 0   # Latest score
@@ -57,8 +61,6 @@ class Pilot:
         output = softmax(relu(np.dot(self.genotype_b, hid_lay)))
 
         return np.argmax(output)
-
-
 
 
 class SpaceShip:

@@ -57,6 +57,8 @@ class MyGame(arcade.Window):
                          arcade.color.WHITE, 24, align="center", anchor_x="center", anchor_y="center")
         arcade.draw_text("B. Player", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 50,
                          arcade.color.WHITE, 24, align="center", anchor_x="center", anchor_y="center")
+        # TODO Add simulation
+        # TODO Work on visuals
 
     def draw_game_over(self):
         """
@@ -76,6 +78,9 @@ class MyGame(arcade.Window):
         """
         Draw ship and obstacles.
         """
+        
+        # TODO: add Simulation
+
         self.ship.draw()
         for obstacle in self.obstacle_list:
             obstacle.draw()
@@ -115,6 +120,7 @@ class MyGame(arcade.Window):
             if self.ship.center_y >= closest_obstacle_bottom_edge:
 
                 if self.simulation_mode:
+                    # TODO correct concept of simulation (iterating over all Ships)
                     self.ship.alive = False
                     self.ship.position_y = -200
                     self.ship.points_when_died = self.score
@@ -183,8 +189,11 @@ class MyGame(arcade.Window):
                 self.current_state = GAME_RUNNING
                 self.AI_mode = False
                 self.setup()
+            # TODO - "If key C" - Turn on simulation
 
         if self.current_state == GAME_RUNNING:
+            # TODO - Add concept of simulation (resetting game when all ships from
+            #        population will die
             if self.ship.alive:
                 if not self.AI_mode:
                     if key == arcade.key.LEFT:

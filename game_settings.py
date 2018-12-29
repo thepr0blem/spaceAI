@@ -14,3 +14,7 @@ OBSTACLE_FREQ = int(SCREEN_HEIGHT/(NO_OBSTACLES - 1))
 MENU = 0
 GAME_RUNNING = 1
 GAME_OVER = 2
+
+# Memory of population
+# TODO - develop structure for
+#  keeping scores and genomes between generations
