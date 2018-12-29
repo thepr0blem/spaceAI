@@ -162,7 +162,7 @@ class MyGame(arcade.Window):
                 self.score += 1
 
             # Ship update
-            self.ship.update(AI_state=self.AI_mode,
+            self.ship.update(ai_state=self.AI_mode,
                              gap_x1=self.obstacle_list[self.closest_obstacle].gap_x1,
                              gap_x2=self.obstacle_list[self.closest_obstacle].gap_x1)
 

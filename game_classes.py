@@ -11,13 +11,31 @@ from game_settings import *
 from add_functions import softmax, relu
 
 
+class Population:
+
+    # TODO / concept:
+    #   This is group of SpaceShip objects, which together with their pilots will be evolving as playing
+    #   .
+    #   Variables:
+    #   - list of playing SpaceShip objects
+    #   - list of dead Spaceship objects
+    #   .
+    #   Methods:
+    #   - initialize with n Spaceships with random genotypes
+    #   - evolve (selection, crossover, mutation)
+    #   - restart (move dead to playing)
+
+    pass
+
+
 class Pilot:
     def __init__(self):
 
         # Random initialization of weights for neural network using two arrays:
         # 1. Weights input -> hidden layer
         # 2. Weights hidden layer -> output
-        self.genotype = [np.random.randn(8, 3), np.random.randn(3, 8)]
+        self.genotype_a = np.random.randn(8, 3)
+        self.genotype_b = np.random.randn(3, 8)
 
         self.latest_score = 0   # Latest score
 
@@ -35,17 +53,18 @@ class Pilot:
         """
 
         input_lay = np.array((x_ship, gap_x1, gap_x2)).reshape(3, 1) / SCREEN_WIDTH
-        hid_lay = relu(np.dot(self.genotype[0], input_lay))
-        output = softmax(relu(np.dot(self.genotype[1], hid_lay)))
+        hid_lay = relu(np.dot(self.genotype_a, input_lay))
+        output = softmax(relu(np.dot(self.genotype_b, hid_lay)))
 
         return np.argmax(output)
+
+
 
 
 class SpaceShip:
     def __init__(self, position_x, position_y, change_x, h_width, color):
 
         # Take the parameters of the init function above, and create instance variables out of them.
-
         self.position_x = position_x
         self.position_y = position_y
         self.change_x = change_x
@@ -55,7 +74,6 @@ class SpaceShip:
         self.alive = True
         self.points_when_died = 0
         self.pilot = Pilot()
-        self.AI = False
 
     def draw(self):
         """ Draw the spaceship with the instance variables we have. """
@@ -67,13 +85,13 @@ class SpaceShip:
 
         arcade.draw_point(self.position_x, self.position_y + 20, arcade.color.BLACK, 5)
 
-    def update(self, AI_state, gap_x1, gap_x2):
+    def update(self, ai_state, gap_x1, gap_x2):
 
-        if not AI_state:
+        if not ai_state:
             # Move left or right
             self.position_x += self.change_x
 
-        if AI_state:
+        if ai_state:
             if self.pilot.decide(self.position_x, gap_x1, gap_x2) == 0:
                 self.position_x += 0
             elif self.pilot.decide(self.position_x, gap_x1, gap_x2) == 1:
