@@ -12,20 +12,65 @@ from add_functions import softmax, relu
 
 
 class Population:
+    def __init__(self):
+
+        self.size = None
+        self.generation_id = 1
+        self.ships_list = []
+        self.dead_ships_list = []
+
+    def populate(self, size=50):
+
+        self.size = size
+
+        for i in range(size):
+
+            self.ships_list.append(SpaceShip(50, 50, 0, 15, arcade.color.BLUE_GREEN))
+
+    def crossover(self, top_ten_ships):
+
+        crossover_weight = rd.random()
+
+        pilot_1 = rd.choice(top_ten_ships).pilot
+        pilot_2 = rd.choice(top_ten_ships).pilot
+
+        gen_1_a = pilot_1.genotype_a
+        gen_1_b = pilot_1.genotype_b
+
+        gen_2_a = pilot_2.genotype_a
+        gen_2_b = pilot_2.genotype_b
+
+        gen_a_new = None  # TODO calculate
+        gen_b_new = None  # TODO calculate
+
+        return gen_a_new, gen_b_new
+
+    def evolve_population(self):
+
+        self.generation_id += 1
+        self.dead_ships_list = self.ships_list[:]
+        self.dead_ships_list.sort(key=lambda c: c.points_when_died)  # TODO: Reverse
+
+        top_ten_ships = self.dead_ships_list[:10]
+
+        for i in range(10):
+            self.ships_list[i] = self.dead_ships_list[i]
+            self.ships_list[i].alive = True
+
+        for i in range(10, self.size):
+
+            new_gen_a, new_gen_b = self.crossover(top_ten_ships)
+
+            self.ship_list[i].pilot.genotype_a = new_gen_a
+            self.ship_list[i].pilot.genotype_b = new_gen_b
+            self.ship_list[i].alive = True
 
     # TODO / concept:
     #   This is group of SpaceShip objects, which together with their pilots will be evolving as playing
     #   *Initialization: If memory of population is empty initalize random Pilots,
     #                    else: take historical data and evolve population
-    #   *Variables:
-    #   - generation number
-    #   - list of playing SpaceShip objects
-    #   - list of dead Spaceship objects
-    #   - list of scores from previous generation
-    #   .
     #   *Methods:
-    #   - initialize with n Spaceships with random genotypes
-    #   - evolve (selection, crossover, mutation)
+    #   - evolve (mutation)
     #   - restart (move dead to playing)
     #   - save best genes to file
 
@@ -64,9 +109,11 @@ class Pilot:
 
 
 class SpaceShip:
+
     def __init__(self, position_x, position_y, change_x, h_width, color):
 
         # Take the parameters of the init function above, and create instance variables out of them.
+
         self.position_x = position_x
         self.position_y = position_y
         self.change_x = change_x
@@ -80,12 +127,21 @@ class SpaceShip:
     def draw(self):
         """ Draw the spaceship with the instance variables we have. """
 
-        arcade.draw_triangle_filled(self.position_x, self.position_y + 40,
-                                    self.position_x - self.half_width, self.position_y,
-                                    self.position_x + self.half_width, self.position_y,
-                                    self.color)
+        if self.alive:
 
-        arcade.draw_point(self.position_x, self.position_y + 20, arcade.color.BLACK, 5)
+            # arcade.draw_triangle_filled(self.position_x, self.position_y + 40,
+            #                             self.position_x - self.half_width, self.position_y,
+            #                             self.position_x + self.half_width, self.position_y,
+            #                             self.color)
+
+            arcade.draw_point(self.position_x, self.position_y + 20, arcade.color.BLACK, 5)
+
+            texture = arcade.load_texture("images/spaceShips_008.png")
+            scale = .5
+
+            arcade.draw_texture_rectangle(self.position_x, self.position_y + 20,
+                                          scale * texture.width, scale * texture.height,
+                                          texture, 0)
 
     def update(self, ai_state, gap_x1, gap_x2):
 
