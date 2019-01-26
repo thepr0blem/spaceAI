@@ -15,6 +15,7 @@ MENU = 0
 GAME_RUNNING = 1
 GAME_OVER = 2
 
-# Memory of population
-# TODO - develop structure for
-#  keeping scores and genomes between generations
+# Population
+POPULATION_SIZE = 5    # Must be > 5
+NUMBER_OF_GENERATIONS = 50
+

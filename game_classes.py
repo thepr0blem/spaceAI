@@ -12,14 +12,27 @@ from add_functions import softmax, relu
 
 
 class Population:
+
+    """
+    Concept:
+      This is group of SpaceShip objects, which together with their pilots will be evolving as playing
+
+      Initialization: If memory of population is empty initalize random Pilots,
+                       else: take historical data and evolve population
+      Methods:
+      - evolve (mutation)
+      - restart (move dead to playing)
+      - save best genes to file
+    """
+
     def __init__(self):
 
         self.size = None
-        self.generation_id = 1
+        self.generation_id = 0
         self.ships_list = []
         self.dead_ships_list = []
 
-    def populate(self, size=50):
+    def populate(self, size=POPULATION_SIZE):
 
         self.size = size
 
@@ -27,54 +40,44 @@ class Population:
 
             self.ships_list.append(SpaceShip(50, 50, 0, 15, arcade.color.BLUE_GREEN))
 
-    def crossover(self, top_ten_ships):
+    def cross_over(self, top_ten_ships):
 
-        crossover_weight = rd.random()
+        xoW = rd.random()   # cross over weight
 
         pilot_1 = rd.choice(top_ten_ships).pilot
         pilot_2 = rd.choice(top_ten_ships).pilot
 
-        gen_1_a = pilot_1.genotype_a
-        gen_1_b = pilot_1.genotype_b
-
-        gen_2_a = pilot_2.genotype_a
-        gen_2_b = pilot_2.genotype_b
-
-        gen_a_new = None  # TODO calculate
-        gen_b_new = None  # TODO calculate
+        gen_a_new = pilot_1.genotype_a * xoW + (1 - xoW) * pilot_2.genotype_a
+        gen_b_new = pilot_1.genotype_b * xoW + (1 - xoW) * pilot_2.genotype_b
 
         return gen_a_new, gen_b_new
 
-    def evolve_population(self):
+    def evolve(self):
 
         self.generation_id += 1
         self.dead_ships_list = self.ships_list[:]
-        self.dead_ships_list.sort(key=lambda c: c.points_when_died)  # TODO: Reverse
+        self.dead_ships_list.sort(key=lambda c: c.points_when_died, reverse=True)
 
         top_ten_ships = self.dead_ships_list[:10]
 
-        for i in range(10):
+        # Save the best genotype to file
+        # file_a = r"./generation_logs/genotype_a_{}.npy".format(self.generation_id)
+        # file_b = r"./generation_logs/genotype_b_{}.npy".format(self.generation_id)
+
+        # np.save(file_a, top_ten_ships[0].pilot.genotype_a)
+        # np.save(file_b, top_ten_ships[0].pilot.genotype_b)
+
+        for i in range(int(0.2 * POPULATION_SIZE)):
             self.ships_list[i] = self.dead_ships_list[i]
             self.ships_list[i].alive = True
 
-        for i in range(10, self.size):
+        for i in range(int(0.2 * POPULATION_SIZE), self.size):
 
-            new_gen_a, new_gen_b = self.crossover(top_ten_ships)
+            new_gen_a, new_gen_b = self.cross_over(top_ten_ships)
 
-            self.ship_list[i].pilot.genotype_a = new_gen_a
-            self.ship_list[i].pilot.genotype_b = new_gen_b
-            self.ship_list[i].alive = True
-
-    # TODO / concept:
-    #   This is group of SpaceShip objects, which together with their pilots will be evolving as playing
-    #   *Initialization: If memory of population is empty initalize random Pilots,
-    #                    else: take historical data and evolve population
-    #   *Methods:
-    #   - evolve (mutation)
-    #   - restart (move dead to playing)
-    #   - save best genes to file
-
-    pass
+            self.ships_list[i].pilot.genotype_a = new_gen_a
+            self.ships_list[i].pilot.genotype_b = new_gen_b
+            self.ships_list[i].alive = True
 
 
 class Pilot:
