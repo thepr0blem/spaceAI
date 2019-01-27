@@ -1,6 +1,9 @@
-""" Classes of game objects:
+"""
+ Classes of game objects:
         SpaceShip - player class
         Obstacle - obstacle, moving walls class
+        Population - ?
+        Pilot - ?
 """
 
 import random as rd
@@ -12,7 +15,6 @@ from add_functions import softmax, relu
 
 
 class Population:
-
     """
     Concept:
       This is group of SpaceShip objects, which together with their pilots will be evolving as playing
@@ -27,57 +29,116 @@ class Population:
 
     def __init__(self):
 
-        self.size = None
+        # Population parameters
         self.generation_id = 0
+        self.all_dead = False
+        self.living_ships = POPULATION_SIZE
+
+        # Population ship lists
         self.ships_list = []
         self.dead_ships_list = []
+        self.top_ships = []
 
-    def populate(self, size=POPULATION_SIZE):
+    def populate(self):
+        """Generate population with ships and randomly intialized brains/pilots. """
 
-        self.size = size
+        self.living_ships = POPULATION_SIZE
+        for i in range(POPULATION_SIZE):
+            self.ships_list.append(SpaceShip(320, 50, 0, 15))
 
-        for i in range(size):
+    def restart_sim(self):
+        """Restart population by cleaning ships_list and fresh initialization. """
 
-            self.ships_list.append(SpaceShip(50, 50, 0, 15, arcade.color.BLUE_GREEN))
+        self.ships_list = []
+        self.dead_ships_list = []
+        self.top_ships = []
+        self.generation_id = 0
+        self.populate()
 
-    def cross_over(self, top_ten_ships):
+    def cross_over(self):
+        """Generate new genoms based on randomly selected ships from n top players from previous generaiton. """
 
+        # Crossover
         xoW = rd.random()   # cross over weight
 
-        pilot_1 = rd.choice(top_ten_ships).pilot
-        pilot_2 = rd.choice(top_ten_ships).pilot
+        pilot_1 = rd.choice(self.top_ships).pilot
+        pilot_2 = rd.choice(self.top_ships).pilot
 
         gen_a_new = pilot_1.genotype_a * xoW + (1 - xoW) * pilot_2.genotype_a
         gen_b_new = pilot_1.genotype_b * xoW + (1 - xoW) * pilot_2.genotype_b
 
+        # Mutation
+        mutationW = rd.uniform(1 - MUTATION_SCALE, 1 + MUTATION_SCALE)
+        mutation = rd.random()
+
+        if mutation <= MUTATION_PROB:
+            # rd_row_a = rd.randint(0, 7)
+            # rd_row_b = rd.randint(0, 2)
+            #
+            # gen_a_new[rd_row_a] = gen_a_new[rd_row_a] * mutationW
+            # gen_b_new[rd_row_b] = gen_b_new[rd_row_b] * mutationW
+
+            gen_a_new = gen_a_new * mutationW
+            gen_b_new = gen_b_new * mutationW
+
         return gen_a_new, gen_b_new
 
     def evolve(self):
+        """ DESCRIPTION """
 
-        self.generation_id += 1
+        # Selection
         self.dead_ships_list = self.ships_list[:]
         self.dead_ships_list.sort(key=lambda c: c.points_when_died, reverse=True)
 
-        top_ten_ships = self.dead_ships_list[:10]
+        self.top_ships = self.dead_ships_list[:int(SELECTION_RATE * POPULATION_SIZE)]
 
-        # Save the best genotype to file
-        # file_a = r"./generation_logs/genotype_a_{}.npy".format(self.generation_id)
-        # file_b = r"./generation_logs/genotype_b_{}.npy".format(self.generation_id)
+        # Taking the best from previous generation
+        for i in range(int(SELECTION_RATE * POPULATION_SIZE)):
+            self.ships_list[i] = self.top_ships[i]
 
-        # np.save(file_a, top_ten_ships[0].pilot.genotype_a)
-        # np.save(file_b, top_ten_ships[0].pilot.genotype_b)
+        # Evolve
+        for i in range(int(SELECTION_RATE * POPULATION_SIZE), POPULATION_SIZE):
 
-        for i in range(int(0.2 * POPULATION_SIZE)):
-            self.ships_list[i] = self.dead_ships_list[i]
-            self.ships_list[i].alive = True
-
-        for i in range(int(0.2 * POPULATION_SIZE), self.size):
-
-            new_gen_a, new_gen_b = self.cross_over(top_ten_ships)
+            new_gen_a, new_gen_b = self.cross_over()
 
             self.ships_list[i].pilot.genotype_a = new_gen_a
             self.ships_list[i].pilot.genotype_b = new_gen_b
-            self.ships_list[i].alive = True
+
+    def save_best_genes(self):
+        """ DESCRIPTION """
+
+        top_gen_a = self.top_ships[0].pilot.genotype_a
+        top_gen_b = self.top_ships[0].pilot.genotype_b
+
+        file_a = BEST_GEN_A_PATH
+        file_b = BEST_GEN_B_PATH
+        file_c = r"./generation_logs/gen_no_{}.npy".format(self.generation_id)
+
+        np.save(file_a, top_gen_a)
+        np.save(file_b, top_gen_b)
+        np.save(file_c, np.zeros((1, 1)))
+
+    def ressurect_ships(self):
+        """ DESCRIPTION """
+
+        for ship in self.ships_list:
+            ship.alive = True
+            ship.position_x = 320
+
+        self.all_dead = False
+
+    def check_if_all_dead(self):
+        """ DESCRIPTION """
+
+        live_ships_num = 0
+        self.all_dead = True
+        for ship in self.ships_list:
+            if ship.alive:
+                self.all_dead = False
+                live_ships_num += 1
+
+        self.living_ships = live_ships_num
+        return self.all_dead
 
 
 class Pilot:
@@ -110,18 +171,25 @@ class Pilot:
 
         return np.argmax(output)
 
+    def load_best_genes(self):
+        """Load best genes from latest saved simulation. """
+
+        loaded_gen_a = np.load(BEST_GEN_A_PATH)
+        loaded_gen_b = np.load(BEST_GEN_B_PATH)
+
+        self.genotype_a = loaded_gen_a
+        self.genotype_b = loaded_gen_b
+
 
 class SpaceShip:
 
-    def __init__(self, position_x, position_y, change_x, h_width, color):
+    def __init__(self, position_x, position_y, change_x, h_width):
 
         # Take the parameters of the init function above, and create instance variables out of them.
-
         self.position_x = position_x
         self.position_y = position_y
         self.change_x = change_x
         self.half_width = h_width
-        self.color = color
         self.center_y = self.position_y + 20
         self.alive = True
         self.points_when_died = 0
@@ -131,11 +199,6 @@ class SpaceShip:
         """ Draw the spaceship with the instance variables we have. """
 
         if self.alive:
-
-            # arcade.draw_triangle_filled(self.position_x, self.position_y + 40,
-            #                             self.position_x - self.half_width, self.position_y,
-            #                             self.position_x + self.half_width, self.position_y,
-            #                             self.color)
 
             arcade.draw_point(self.position_x, self.position_y + 20, arcade.color.BLACK, 5)
 
@@ -182,6 +245,8 @@ class Obstacle:
     def draw(self):
         """ Draw space obstacle. """
 
+        # TODO: Define new texture for obstacle
+
         arcade.draw_rectangle_filled(0.5 * self.gap_x1, self.position_y,
                                      self.gap_x1, self.thickness,
                                      self.color)
@@ -199,6 +264,7 @@ class Obstacle:
 
     def update(self, delta_time):
         """Move obstacle downwards. """
+
         # Move the obstacle
         if self.is_active:
             self.position_y -= OBSTACLE_SPEED * delta_time
