@@ -70,23 +70,23 @@ class MyGame(arcade.Window):
         """Draw MENU. """
 
         arcade.draw_rectangle_filled(int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5), 700, 250, arcade.color.BLACK)
-        arcade.draw_text("Choose game mode: ", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) + 75,
-                         arcade.color.WHITE, 24, align="center", anchor_x="center", anchor_y="center")
-        arcade.draw_text("A. Random Autopilot", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) + 25,
-                         arcade.color.WHITE, 24, align="center", anchor_x="center", anchor_y="center")
-        arcade.draw_text("B. Human Player", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 25,
-                         arcade.color.WHITE, 24, align="center", anchor_x="center", anchor_y="center")
-        arcade.draw_text("C. Simulation", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 75,
-                         arcade.color.WHITE, 24, align="center", anchor_x="center", anchor_y="center")
-        arcade.draw_text("D. Top Pilot", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 125,
-                         arcade.color.WHITE, 24, align="center", anchor_x="center", anchor_y="center")
+        arcade.draw_text("Choose game mode: ", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) + 90,
+                         arcade.color.WHITE, 28, align="center", anchor_x="center", anchor_y="center")
+        arcade.draw_text("A. Random Autopilot", 170, 300,
+                         arcade.color.WHITE, 20, anchor_x="left", anchor_y="top")
+        arcade.draw_text("B. Human Player", 170, 260,
+                         arcade.color.WHITE, 20, anchor_x="left", anchor_y="top")
+        arcade.draw_text("C. Simulation", 170, 220,
+                         arcade.color.WHITE, 20, anchor_x="left", anchor_y="top")
+        arcade.draw_text("D. Top Pilot", 170, 180,
+                         arcade.color.WHITE, 20, anchor_x="left", anchor_y="top")
 
     def draw_game_over(self):
         """Draw "Game over" across the screen. """
 
         arcade.draw_rectangle_filled(int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5), 700, 250, arcade.color.BLACK)
-        arcade.draw_text("Game Over", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) + 60,
-                         arcade.color.WHITE, 54, align="center", anchor_x="center", anchor_y="center")
+        arcade.draw_text("Game Over", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) + 70,
+                         arcade.color.WHITE, 50, align="center", anchor_x="center", anchor_y="center")
         arcade.draw_text("1. SPACE to restart", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5),
                          arcade.color.WHITE, 16, align="center", anchor_x="center", anchor_y="center")
         arcade.draw_text("2. ENTER to return to MENU", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 40,
@@ -107,14 +107,14 @@ class MyGame(arcade.Window):
         """Draw simulation menu on the screen. """
 
         arcade.draw_rectangle_filled(int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5), 700, 250, arcade.color.BLACK)
-        arcade.draw_text("SIM MENU", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) + 60,
-                         arcade.color.WHITE, 54, align="center", anchor_x="center", anchor_y="center")
-        arcade.draw_text("1. SPACE to restart simulation", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5),
-                         arcade.color.WHITE, 16, align="center", anchor_x="center", anchor_y="center")
-        arcade.draw_text("2. S to save best genes from latest generation", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 40,
-                         arcade.color.WHITE, 16, align="center", anchor_x="center", anchor_y="center")
-        arcade.draw_text("3. Click ESC to leave to MAIN menu", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 80,
-                         arcade.color.WHITE, 16, align="center", anchor_x="center", anchor_y="center")
+        arcade.draw_text("Simulation MENU:", 30, 350,
+                         arcade.color.WHITE, 28, anchor_x="left", anchor_y="top")
+        arcade.draw_text("1. SPACE to restart simulation", 30, 300,
+                         arcade.color.WHITE, 18, anchor_x="left", anchor_y="top")
+        arcade.draw_text("2. S to save best genes from latest generation", 30, 260,
+                         arcade.color.WHITE, 18, anchor_x="left", anchor_y="top")
+        arcade.draw_text("3. Click ESC to leave to MAIN menu", 30, 220,
+                         arcade.color.WHITE, 18, anchor_x="left", anchor_y="top")
 
     def draw_game(self):
         """Draw ship and obstacles. """
@@ -143,8 +143,10 @@ class MyGame(arcade.Window):
             gen_id = f"gen_id: {self.population.generation_id}"
             arcade.draw_text(gen_id, 90, 10, arcade.color.WHITE, 13)
 
-            gen_id = f"live_ships: {self.population.living_ships}"
-            arcade.draw_text(gen_id, 180, 10, arcade.color.WHITE, 13)
+            live_ships = f"live_ships: {self.population.living_ships}"
+            arcade.draw_text(live_ships, 180, 10, arcade.color.WHITE, 13)
+
+            arcade.draw_text("R to enter simulation MENU", 305, 10, arcade.color.WHITE, 13)
 
         else:
             # Display x1 and x2 coordinates of gap in closest obstacle

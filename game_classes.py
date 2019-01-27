@@ -146,9 +146,9 @@ class Pilot:
 
         # Random initialization of weights for neural network using two arrays:
         # 1. Weights input -> hidden layer
-        self.genotype_a = np.random.randn(8, 3)
+        self.genotype_a = np.random.randn(NEURONS, 3)
         # 2. Weights hidden layer -> output
-        self.genotype_b = np.random.randn(3, 8)
+        self.genotype_b = np.random.randn(3, NEURONS)
 
         self.latest_score = 0   # Latest score
 
@@ -160,7 +160,7 @@ class Pilot:
             - closest obstacle position (gap_x1, gap_x2, delta_y)
             Structure of NN:
             - 3 input values
-            - 1 hidden layer with 8 neurons
+            - 1 hidden layer with NEURONS neurons
             - 3 output values
             Returns: 0 - STAY, 1 - LEFT, 2 - RIGHT
         """
@@ -245,15 +245,25 @@ class Obstacle:
     def draw(self):
         """ Draw space obstacle. """
 
-        # TODO: Define new texture for obstacle
+        # --- TEXTURED RECTANGLE ---
+        obstacle_texture = arcade.load_texture("images/spaceBuilding_016.png")
 
-        arcade.draw_rectangle_filled(0.5 * self.gap_x1, self.position_y,
-                                     self.gap_x1, self.thickness,
-                                     self.color)
+        arcade.draw_texture_rectangle(0.5 * self.gap_x1, self.position_y,
+                                      self.gap_x1, self.thickness,
+                                      obstacle_texture)
 
-        arcade.draw_rectangle_filled(0.5 * (SCREEN_WIDTH + self.gap_x2), self.position_y,
-                                     SCREEN_WIDTH - self.gap_x2, self.thickness,
-                                     self.color)
+        arcade.draw_texture_rectangle(0.5 * (SCREEN_WIDTH + self.gap_x2), self.position_y,
+                                      SCREEN_WIDTH - self.gap_x2, self.thickness,
+                                      obstacle_texture)
+
+        # --- FILLED RECTANGLE ---
+        # arcade.draw_rectangle_filled(0.5 * self.gap_x1, self.position_y,
+        #                              self.gap_x1, self.thickness,
+        #                              self.color)
+        #
+        # arcade.draw_rectangle_filled(0.5 * (SCREEN_WIDTH + self.gap_x2), self.position_y,
+        #                              SCREEN_WIDTH - self.gap_x2, self.thickness,
+        #                              self.color)
 
     def respawn(self):
         """Respawn obstacle after going out of the screen. """

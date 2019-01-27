@@ -1,3 +1,5 @@
+
+""" NEURAL NETWORK functions """
 import numpy as np
 
 
