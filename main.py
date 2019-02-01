@@ -4,7 +4,7 @@ Main script for Space-Traveler game
 import arcade
 import time
 
-from game_settings import *
+from settings import *
 from game_classes import Obstacle, SpaceShip, Population
 
 
@@ -37,7 +37,7 @@ class MyGame(arcade.Window):
         self.population.populate()
 
     def setup(self):
-        """Set up the game. """
+        """ Set up the game. """
 
         # Background
         self.background = arcade.load_texture("images/background.png")
@@ -67,7 +67,7 @@ class MyGame(arcade.Window):
             self.obstacle_list.append(obstacle)
 
     def draw_menu(self):
-        """Draw MENU. """
+        """Draw MENU screen. """
 
         arcade.draw_rectangle_filled(int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5), 700, 250, arcade.color.BLACK)
         arcade.draw_text("Choose game mode: ", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) + 90,
@@ -82,7 +82,7 @@ class MyGame(arcade.Window):
                          arcade.color.WHITE, 20, anchor_x="left", anchor_y="top")
 
     def draw_game_over(self):
-        """Draw "Game over" across the screen. """
+        """Draw GAME OVER screen. """
 
         arcade.draw_rectangle_filled(int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5), 700, 250, arcade.color.BLACK)
         arcade.draw_text("Game Over", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) + 70,
@@ -91,20 +91,19 @@ class MyGame(arcade.Window):
                          arcade.color.WHITE, 16, align="center", anchor_x="center", anchor_y="center")
         arcade.draw_text("2. ENTER to return to MENU", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 40,
                          arcade.color.WHITE, 16, align="center", anchor_x="center", anchor_y="center")
-        if not self.simulation_mode:
-            arcade.draw_text(f"Score: {self.ship.points_when_died}",
-                             int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 80,
-                             arcade.color.WHITE, 16, align="center", anchor_x="center", anchor_y="center")
+        arcade.draw_text(f"Score: {self.ship.points_when_died}",
+                         int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) - 80,
+                         arcade.color.WHITE, 16, align="center", anchor_x="center", anchor_y="center")
 
     def draw_evo_state(self):
-        """Draw evolution loading screen. """
+        """Displays EVOLUTION screen when calculating new generation. """
 
         arcade.draw_rectangle_filled(int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5), 700, 250, arcade.color.BLACK)
         arcade.draw_text("Evolution", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5),
                          arcade.color.WHITE, 54, align="center", anchor_x="center", anchor_y="center")
 
     def draw_sim_menu(self):
-        """Draw simulation menu on the screen. """
+        """Displays SIMULATION menu on the screen. """
 
         arcade.draw_rectangle_filled(int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5), 700, 250, arcade.color.BLACK)
         arcade.draw_text("Simulation MENU:", 30, 350,
@@ -117,7 +116,11 @@ class MyGame(arcade.Window):
                          arcade.color.WHITE, 18, anchor_x="left", anchor_y="top")
 
     def draw_game(self):
-        """Draw ship and obstacles. """
+        """Draws game on the screen, including:
+            -   ship / population of ships
+            -   obstacles
+            -   bottom bar with information
+        """
 
         if self.simulation_mode:
             for ship in self.population.ships_list:
@@ -131,23 +134,25 @@ class MyGame(arcade.Window):
         self.draw_bottom_bar()
 
     def draw_bottom_bar(self):
-        """Draws bottom bar with score and closest obstacle information. """
+        """Displays bottom info bar on the screen. """
 
-        # Drawing bottom screen area with score and dist to closest obstacle.
+        # Drawing bottom screen area with score and dist to closest obstacle
         arcade.draw_rectangle_filled(320, 15, 640, 30, arcade.color.BLACK)
         score_text = f"Score: {self.score}"
         arcade.draw_text(score_text, 10, 10, arcade.color.WHITE, 13)
 
-        # Generation ID
+        # Draws generation number and # of ships alive if in simulation mode
         if self.simulation_mode:
+
             gen_id = f"gen_id: {self.population.generation_id}"
             arcade.draw_text(gen_id, 90, 10, arcade.color.WHITE, 13)
 
-            live_ships = f"live_ships: {self.population.living_ships}"
+            live_ships = f"ships_alive: {self.population.living_ships}"
             arcade.draw_text(live_ships, 180, 10, arcade.color.WHITE, 13)
 
             arcade.draw_text("R to enter simulation MENU", 305, 10, arcade.color.WHITE, 13)
 
+        # Draws coordinates and distance to closest obstacle if in single-player mode
         else:
             # Display x1 and x2 coordinates of gap in closest obstacle
             near_obs_x1 = f"gap_x1 = {round(self.obstacle_list[self.closest_obstacle].gap_x1)}"
@@ -162,12 +167,13 @@ class MyGame(arcade.Window):
             arcade.draw_text(near_obs_y, 90, 10, arcade.color.WHITE, 13)
 
     def check_for_collision(self):
-        """Checks for collision between ship/ships and closest obstacle. """
+        """Checks for collision between ship / population of ships and closest obstacle. """
 
-        # Identyfing closes obstacle
+        # Calculating y position of closest obstacle bottom edge
         closest_obstacle_bottom_edge = self.obstacle_list[self.closest_obstacle].position_y \
-                                       - self.obstacle_list[self.closest_obstacle].thickness * 0.5
+                                     - self.obstacle_list[self.closest_obstacle].thickness * 0.5
 
+        # Calculating x1, x2 positions of gap in closest obstacle
         closest_obstacle_x1 = self.obstacle_list[self.closest_obstacle].gap_x1
         closest_obstacle_x2 = self.obstacle_list[self.closest_obstacle].gap_x2
 
@@ -193,7 +199,7 @@ class MyGame(arcade.Window):
                             ship.points_when_died = self.score
 
     def on_draw(self):
-        """ Called whenever we need to draw the window. """
+        """Called whenever we need to draw the window. """
 
         arcade.start_render()
 
@@ -204,24 +210,26 @@ class MyGame(arcade.Window):
         if self.current_state == MENU:
             self.draw_menu()
 
-        if self.current_state == GAME_RUNNING:
+        elif self.current_state == GAME_RUNNING:
             self.draw_game()
 
-        if self.current_state == EVOLUTION:
+        elif self.current_state == EVOLUTION:
             self.draw_game()
             self.draw_evo_state()
 
-        if self.current_state == GAME_OVER:
+        elif self.current_state == GAME_OVER:
             self.draw_game()
             self.draw_game_over()
 
-        if self.current_state == SIMULATION_MENU:
+        elif self.current_state == SIMULATION_MENU:
             self.draw_game()
             self.draw_sim_menu()
 
     def ident_clos_obstacle(self):
         """Identifies closest obstacle. """
 
+        # Take the next obstacle form the list if y position of the current closest obstacle is smaller
+        # than y position of center of the ship
         if self.obstacle_list[self.closest_obstacle].position_y < 70:
             if self.closest_obstacle == 3:
                 self.closest_obstacle = 0
@@ -229,8 +237,9 @@ class MyGame(arcade.Window):
                 self.closest_obstacle += 1
 
     def update(self, delta_time):
+        """Updates current state of the game. """
 
-        # --- SIMULATION MODE (MULTIPLE SHIPS) ---
+        # --- SIMULATION MODE (POPULATION OF SHIPS) --- #
         if self.simulation_mode:
 
             if self.current_state == EVOLUTION:
@@ -239,10 +248,11 @@ class MyGame(arcade.Window):
                 self.current_state = GAME_RUNNING
                 self.setup()
 
-            if self.current_state == GAME_RUNNING:
+            elif self.current_state == GAME_RUNNING:
+
                 self.check_for_collision()
 
-                # Check to start evolution
+                # Check if whole generation died
                 if self.population.check_if_all_dead():
 
                     # Deactivate obstacles
@@ -269,7 +279,7 @@ class MyGame(arcade.Window):
                 for obstacle in self.obstacle_list:
                     obstacle.update(delta_time)
 
-        # --- SINGLE SHIP MODE ---
+        # --- SINGLE SHIP MODE --- #
         else:
             if self.current_state == GAME_RUNNING:
 
@@ -292,7 +302,7 @@ class MyGame(arcade.Window):
                 self.check_for_collision()
 
     def on_key_press(self, key, modifiers):
-        """ Called whenever the user presses a key. """
+        """Called whenever the user presses a key. """
 
         # --- MAIN MENU BUTTONS --- #
         if self.current_state == MENU:
