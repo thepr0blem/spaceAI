@@ -1,5 +1,23 @@
 """
-Main script for Space-Traveler game
+--- SpaceAI game ---
+
+The main purpose of this exercise is to build a simple "space runner" game which will be an environment
+for genetic algorithm implementation.
+
+The game has 4 modes:
+A. Random Autopilot - spaceship is steered by AI with randomly initialized neural network
+B. Human Player - spaceship is steered by human player (LEFT and RIGHT arrow keys)
+C. Simulation - in this mode population is generated and evolved until the user decides to stop on current generation
+and save latest genes of most successful pilot to file
+D. Top Pilot - loads genes from previous simulations and initialize intelligent pilot to steer the spaceship
+
+Tips for moving between screens:
+- Game Over Menu is displayed after spaceship dies in modes A, B or D. From Game Over Menu user may go to Main Menu
+or restart current mode.
+- Simulation - press R to go to Simulation Menu. Here you can save latest genes, restart simulation or go to Main Menu
+
+Run this file to turn on the game.
+
 """
 import arcade
 import time
@@ -9,6 +27,7 @@ from game_classes import Obstacle, SpaceShip, Population
 
 
 class MyGame(arcade.Window):
+    """Game class. """
 
     def __init__(self, width, height, title):
 
@@ -37,7 +56,7 @@ class MyGame(arcade.Window):
         self.population.populate()
 
     def setup(self):
-        """ Set up the game. """
+        """Set up the game. """
 
         # Background
         self.background = arcade.load_texture("images/background.png")
