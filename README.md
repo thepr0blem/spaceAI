@@ -36,8 +36,21 @@ Run ```main.py``` script. Required technologies are listed in ```requirments.txt
 
 ## 2. Neural network architecture and training using genetic algorithm 
 ### 2.1. NN architecture 
+
+Making decision on which direction ship moves using neural network. Properties of neural network:
+Input: x coordinates of the ship and closest obstacle (```x_ship```, ```gap_x1```, ```gap_x2```)
+Structure of NN:
+- 3 input values
+- 1 hidden layer with 8 neurons - can be adjusted in ```settings.py```
+- 3 output values (0 - STAY, 1 - LEFT, 2 - RIGHT)
+
+![NN](https://github.com/thepr0blem/spaceAI/blob/master/images/nn_edit.png)
+
 ### 2.2. Genetic algorithm 
-#### 2.2.1. Introduction and pipeline
+#### 2.2.1. Introduction
+
+Neural network will be optimized using Genetic Algorithm (GA), which simulates natural process population evolution through selection, crossover and mutation
+
 #### 2.2.2. Selection
 #### 2.3.3. Crossover
 #### 2.3.4. Mutation 
