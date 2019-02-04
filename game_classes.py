@@ -21,7 +21,7 @@ class Population:
     Methods:
         - populate - generates collection of POPULATION_SIZE ships
         - restart_sim - restars population by cleaning ships_list and performing fresh initialization
-        - cross_oveer - generate new genotypes based on randomly selected ships from
+        - cross_over - generate new genotypes based on randomly selected ships from
         n [POPULATION_SIZE * SELECTION_RATE (see settings)] top players from previous generation.
         This method applies mutation and crossover steps from evolution algorithm
         - evolve - performs evolution algorithm steps: selection, crossover and mutation and reassigns Pilots genotypes
@@ -59,7 +59,7 @@ class Population:
         self.populate()
 
     def cross_over(self):
-        """Generate new genoms based on randomly selected ships from n top players from previous generaiton. """
+        """Generate new genoms based on randomly selected ships from n top players from previous generation. """
 
         # --- Crossover ---
         # Crossover weight
