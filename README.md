@@ -2,6 +2,8 @@
 
 Simple space runner implementation in Python Arcade + AI player with neural network trained using genetic algorithm.
 
+<img src="https://github.com/thepr0blem/spaceAI/blob/master/images/scr_1.PNG" width="700">
+
 ### Content of this document 
 1. Introduction
 2. Neural network architecture and training using genetic algorithm
@@ -44,7 +46,7 @@ Structure of NN:
 - 1 hidden layer with 8 neurons - can be adjusted in ```settings.py```
 - 3 output values (0 - STAY, 1 - LEFT, 2 - RIGHT)
 
-![NN](https://github.com/thepr0blem/spaceAI/blob/master/images/nn_edit.png)
+<img src="https://github.com/thepr0blem/spaceAI/blob/master/images/nn_edit.png" width="700">
 
 ### 2.2. Genetic algorithm 
 #### 2.2.1. Introduction
@@ -54,7 +56,7 @@ Neural network will be optimized using Genetic Algorithm (GA), which simulates n
 The simulation will randomly initialize population of N Spaceships with randomly generated neural networks as their "brains". Size of the population can be set in ```settings.py``` file. 
 
 #### Fitness function 
-To evaluate each individual we simply take number of points gathered during single game. Given the simple rules of the game, the number of passed obstacles is the SCORE.
+To evaluate each individual we simply take the number of points gathered during single game. Given the simple rules of the game, the number of passed obstacles is the SCORE.
 
 #### 2.2.2. Selection
 
