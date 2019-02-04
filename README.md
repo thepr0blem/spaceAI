@@ -105,15 +105,19 @@ mutationW = rd.uniform(1 - MUTATION_SCALE, 1 + MUTATION_SCALE)
 
 The game has 4 modes:
 
-#### A. Random Autopilot - spaceship is steered by AI with randomly initialized neural network
+#### A. Random Autopilot
+Spaceship is steered by AI with randomly initialized neural network
 
-#### B. Human Player - spaceship is steered by human player (```LEFT``` and ```RIGHT``` arrow keys)
+#### B. Human Player 
+Spaceship is steered by human player (```LEFT``` and ```RIGHT``` arrow keys)
 
-#### C. Simulation - in this mode population is generated and evolved until the user decides to stop on current generation and save latest genes of the most successful pilot to file
+#### C. Simulation 
+In this mode population is generated and evolved until the user decides to stop on current generation and save latest genes of the most successful pilot to file
 
-#### D. Top Pilot - loads genes from previous simulations and initialize intelligent pilot to steer the spaceship
+#### D. Top Pilot
+Loads genes from previous simulations and initialize intelligent pilot to steer the spaceship
 
-Tips for moving between screens:
+*Tips for moving between screens*:
 - **GAME OVER** is displayed after spaceship dies in modes ```A```, ```B``` or ```D```. From **GAME OVER** user may go back to **MAIN MENU** or restart current mode.
 - **SIMULATION** - press ```R``` in **SIMULATION** to go to **SIMULATION MENU**. Here you can save latest genes, restart simulation or go back to **MAIN MENU**
 
