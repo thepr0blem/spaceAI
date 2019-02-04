@@ -121,10 +121,22 @@ Loads genes from previous simulations and initialize intelligent pilot to steer 
 
 ### 3.2. Screenshots
 
+#### Main Menu
+<img src="https://github.com/thepr0blem/spaceAI/blob/master/images/Main_menu.PNG" width="500">
+
+#### Sim Menu
+<img src="https://github.com/thepr0blem/spaceAI/blob/master/images/Sim_menu.png" width="500">
+
+#### A, B, D modes
+<img src="https://github.com/thepr0blem/spaceAI/blob/master/images/scr_1.PNG" width="500">
+
+#### Simulation mode
+<img src="https://github.com/thepr0blem/spaceAI/blob/master/images/scr_2.png" width="500">
 
 
 ### 3.3. Classes and logic
 
+TO DO 
 
 ## 4. Potential next steps/ideas 
 #### I. Test different NN architectures (variable number of layers) 
