@@ -24,7 +24,7 @@ The main purpose of this exercise (beside the obvious, which is self-development
 ├── images                  # Game graphics
 ├── main.py                 # main file (contains game class)
 ├── game_classes.py         # in-game objects (Spaceship, obstacles etc.) 
-├── helper_functions.py     
+├── helper_functions.py     # ReLU and softmax functions
 ├── settings.py             # Game and simulation settings
 ├── requirments.txt         # Required libraries
 └── README.md                 
@@ -49,7 +49,7 @@ Structure of NN:
 ### 2.2. Genetic algorithm 
 #### 2.2.1. Introduction
 
-Neural network will be optimized using Genetic Algorithm (GA), which simulates natural process population evolution through selection, crossover and mutation
+Neural network will be optimized using Genetic Algorithm (GA), which simulates natural process of population evolution through selection, crossover and mutation. 
 
 #### 2.2.2. Selection
 #### 2.3.3. Crossover
