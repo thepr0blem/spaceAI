@@ -49,9 +49,17 @@ Structure of NN:
 ### 2.2. Genetic algorithm 
 #### 2.2.1. Introduction
 
-Neural network will be optimized using Genetic Algorithm (GA), which simulates natural process of population evolution through selection, crossover and mutation. 
+Neural network will be optimized using Genetic Algorithm (GA), which simulates natural process of population evolution through selection, crossover and mutation. In this case, I will treat NN weights as a set of properties (genotype) which can be mutated. This will allow to find an optimal or close to optimal set of weights which will be used to steer the Spaceship between obstacles. 
+
+The simulation will randomly initialize population of N Spaceships with randomly generated neural networks as their "brains". Size of the population can be set in ```settings.py``` file. 
+
+#### Fitness function 
+To evaluate each individual we simply take number of points gathered during single game. Given the simple rules of the game, the number of passed obstacles is the SCORE.
 
 #### 2.2.2. Selection
+
+
+
 #### 2.3.3. Crossover
 #### 2.3.4. Mutation 
 ## 3. Game engine 
