@@ -2,8 +2,6 @@
 
 Simple space runner implementation in Python Arcade + AI player with neural network trained using genetic algorithm.
 
-
-
 ### Content of this document 
 1. Introduction
 2. Neural network architecture and training using genetic algorithm
@@ -121,7 +119,12 @@ Loads genes from previous simulations and initialize intelligent pilot to steer 
 - **GAME OVER** is displayed after spaceship dies in modes ```A```, ```B``` or ```D```. From **GAME OVER** user may go back to **MAIN MENU** or restart current mode.
 - **SIMULATION** - press ```R``` in **SIMULATION** to go to **SIMULATION MENU**. Here you can save latest genes, restart simulation or go back to **MAIN MENU**
 
-### 3.2. Classes and logic 
+### 3.2. Screenshots
+
+
+
+### 3.3. Classes and logic
+
 
 ## 4. Potential next steps/ideas 
 #### I. Test different NN architectures (variable number of layers) 
