@@ -143,6 +143,11 @@ I. Test different NN architectures (variable number of layers)
 
 II. Add "coins" in the middle of each gap giving additional points if collected 
 
-### References 
+### Sources 
 
-TO DO 
+Graphics: 
+- textures come from amazing [Kenney.nl](https://Kenney.nl) 
+- background: [PXHere.com](https://pxhere.com/en/photo/915272)
+
+Reference documents: 
+- [Genetic Algorithm Wikipedia page](https://en.wikipedia.org/wiki/Genetic_algorithm)
