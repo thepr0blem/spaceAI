@@ -11,7 +11,7 @@ import arcade
 import numpy as np
 
 from settings import *
-from helper_functions import softmax, relu
+from nn_functions import softmax, relu
 
 
 class Population:
@@ -110,22 +110,6 @@ class Population:
             self.ships_list[i].pilot.genotype_a = new_gen_a
             self.ships_list[i].pilot.genotype_b = new_gen_b
 
-    def save_best_genes(self):
-        """Saves genes of latest top scorer to file. """
-
-        # Take genes from top ship from latest generation
-        top_gen_a = self.top_ships[0].pilot.genotype_a
-        top_gen_b = self.top_ships[0].pilot.genotype_b
-
-        # Save to files
-        file_a = BEST_GEN_A_PATH
-        file_b = BEST_GEN_B_PATH
-        file_c = r"./generation_logs/gen_no_{}.npy".format(self.generation_id)
-
-        np.save(file_a, top_gen_a)
-        np.save(file_b, top_gen_b)
-        np.save(file_c, np.zeros((1, 1)))
-
     def ressurect_ships(self):
         """Resurrects all ships in population and reposition them to the middle of the screen. """
 
@@ -185,11 +169,21 @@ class Pilot:
     def load_best_genes(self):
         """Load best genes from latest saved simulation. """
 
-        loaded_gen_a = np.load(BEST_GEN_A_PATH)     # saved file directory defined in settings
-        loaded_gen_b = np.load(BEST_GEN_B_PATH)     # saved file directory defined in settings
+        # saved file directory defined in settings
+        self.genotype_a = np.load(BEST_GEN_A_PATH)
+        self.genotype_b = np.load(BEST_GEN_B_PATH)
 
-        self.genotype_a = loaded_gen_a
-        self.genotype_b = loaded_gen_b
+    def save_genes(self, gen_id):
+        """Saves pilot's genes to file. """
+
+        # Save to files
+        file_a = BEST_GEN_A_PATH
+        file_b = BEST_GEN_B_PATH
+        file_c = r"./generation_logs/gen_no_{}.npy".format(gen_id)
+
+        np.save(file_a, self.genotype_a)
+        np.save(file_b, self.genotype_b)
+        np.save(file_c, np.zeros((1, 1)))
 
 
 class SpaceShip:
