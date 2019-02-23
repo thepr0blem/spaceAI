@@ -38,9 +38,8 @@ class MyGame(arcade.Window):
         # Mouse cursor not visible
         self.set_mouse_visible(False)
 
-        # Background color
-        arcade.set_background_color(arcade.color.CHARLESTON_GREEN)
-        self.background = None
+        # Background
+        self.background = arcade.load_texture("images/background.png")
 
         # Variables initialization
         self.ship = None
@@ -58,9 +57,6 @@ class MyGame(arcade.Window):
 
     def setup(self):
         """Set up the game. """
-
-        # Background
-        self.background = arcade.load_texture("images/background.png")
 
         # Create player/population
         if self.simulation_mode:
@@ -236,12 +232,12 @@ class MyGame(arcade.Window):
         # --- GAME RUNNING BUTTONS --- #
         if self.current_state == GAME_RUNNING:
 
-            # --- SIMULATION MODE (MULTIPLE SHIPS) ---
+            # - SIMULATION MODE (MULTIPLE SHIPS) -
             if self.simulation_mode:
                 if key == arcade.key.R:
                     self.current_state = SIMULATION_MENU
 
-            # --- SINGLE SHIP MODE ---
+            # - SINGLE SHIP MODE -
             else:
                 if self.ship.alive:
                     if not self.AI_mode:
@@ -256,7 +252,7 @@ class MyGame(arcade.Window):
         # --- SIMULATION MENU BUTTONS --- #
         if self.current_state == SIMULATION_MENU:
             if key == arcade.key.S:
-                self.population.top_ships[0].pilot.save_genes(gen_id=self.population.generation_id)
+                self.population.top_ships[0].pilot.save_genes()
                 self.current_state = MENU
             elif key == arcade.key.SPACE:
                 self.current_state = GAME_RUNNING
@@ -293,9 +289,18 @@ class MyGame(arcade.Window):
         closest_obstacle_x1 = self.obstacle_list[self.closest_obstacle].gap_x1
         closest_obstacle_x2 = self.obstacle_list[self.closest_obstacle].gap_x2
 
-        # --- COLLISIONS IN SINGLE SHIP MODE ---
-        if not self.simulation_mode:
+        # --- COLLISONS IN SIMULATION MODE (MULTIPLE SHIPS) ---
+        if self.simulation_mode:
 
+            for ship in self.population.ships_list:
+                if ship.alive:
+                    if 0 <= ship.position_x <= closest_obstacle_x1 or closest_obstacle_x2 <= ship.position_x <= 640:
+                        if ship.center_y >= closest_obstacle_bottom_edge:
+                            ship.alive = False
+                            ship.points_when_died = self.score
+
+        # --- COLLISIONS IN SINGLE SHIP MODE ---
+        else:
             if 0 <= self.ship.position_x <= closest_obstacle_x1 or closest_obstacle_x2 <= self.ship.position_x <= 640:
                 if self.ship.center_y >= closest_obstacle_bottom_edge:
 
@@ -304,15 +309,6 @@ class MyGame(arcade.Window):
                     self.ship.points_when_died = self.score
                     for obstacle in self.obstacle_list:
                         obstacle.is_active = False
-
-        # --- COLLISONS IN SIMULATION MODE (MULTIPLE SHIPS) ---
-        else:
-            for ship in self.population.ships_list:
-                if ship.alive:
-                    if 0 <= ship.position_x <= closest_obstacle_x1 or closest_obstacle_x2 <= ship.position_x <= 640:
-                        if ship.center_y >= closest_obstacle_bottom_edge:
-                            ship.alive = False
-                            ship.points_when_died = self.score
 
     def ident_clos_obstacle(self):
         """Identifies closest obstacle. """
@@ -324,6 +320,7 @@ class MyGame(arcade.Window):
                 self.closest_obstacle = 0
             else:
                 self.closest_obstacle += 1
+
 
 def main():
     window = MyGame(640, 480, "spaceAI")

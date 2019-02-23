@@ -11,7 +11,7 @@ import arcade
 import numpy as np
 
 from settings import *
-from nn_functions import softmax, relu
+from ext_functions import softmax, relu, cross_over
 
 
 class Population:
@@ -21,9 +21,6 @@ class Population:
     Methods:
         - populate - generates collection of POPULATION_SIZE ships
         - restart_sim - restars population by cleaning ships_list and performing fresh initialization
-        - cross_over - generate new genotypes based on randomly selected ships from
-        n [POPULATION_SIZE * SELECTION_RATE (see settings)] top players from previous generation.
-        This method applies mutation and crossover steps from evolution algorithm
         - evolve - performs evolution algorithm steps: selection, crossover and mutation and reassigns Pilots genotypes
         - save_best_genes - saves genes of latest top scorer to file
         - ressurect_ships - resurrects all ships in population and reposition them to the middle of the screen
@@ -58,58 +55,6 @@ class Population:
         self.generation_id = 0
         self.populate()
 
-    def cross_over(self):
-        """Generate new genoms based on randomly selected ships from n top players from previous generation. """
-
-        # --- Crossover ---
-        # Crossover weight
-        xoW = rd.random()
-
-        # Random choice of two pilots from top ones to take them as parents
-        pilot_1 = rd.choice(self.top_ships).pilot
-        pilot_2 = rd.choice(self.top_ships).pilot
-
-        # Crossing genes of parents
-        gen_a_new = pilot_1.genotype_a * xoW + (1 - xoW) * pilot_2.genotype_a
-        gen_b_new = pilot_1.genotype_b * xoW + (1 - xoW) * pilot_2.genotype_b
-
-        # --- Mutation ---
-        # Random choice of mutation weight from range (typically 0.8 - 1.2)
-        mutationW = rd.uniform(1 - MUTATION_SCALE, 1 + MUTATION_SCALE)
-
-        mutation = rd.random()
-        # Check if mutation happens
-        if mutation <= MUTATION_PROB:
-
-            # Modify whole genes by multiplying their weights with mutation weight
-            gen_a_new = gen_a_new * mutationW
-            gen_b_new = gen_b_new * mutationW
-
-        return gen_a_new, gen_b_new
-
-    def evolve(self):
-        """Performs evolution algorithm steps: selection, crossover and mutation and reassigns Pilots genotypes. """
-
-        # --- Selection ---
-        self.dead_ships_list = self.ships_list[:]
-        # Sort ships by their performance (measured by score)
-        self.dead_ships_list.sort(key=lambda c: c.points_when_died, reverse=True)
-
-        # Assign best scorers to top_ships
-        self.top_ships = self.dead_ships_list[:int(SELECTION_RATE * POPULATION_SIZE)]
-
-        # Top ships are survivors, they go to next generation
-        for i in range(int(SELECTION_RATE * POPULATION_SIZE)):
-            self.ships_list[i] = self.top_ships[i]
-
-        # Generate "children" for the next generation by crossing over randomly chosen parents from top_ships
-        for i in range(int(SELECTION_RATE * POPULATION_SIZE), POPULATION_SIZE):
-
-            new_gen_a, new_gen_b = self.cross_over()
-
-            self.ships_list[i].pilot.genotype_a = new_gen_a
-            self.ships_list[i].pilot.genotype_b = new_gen_b
-
     def ressurect_ships(self):
         """Resurrects all ships in population and reposition them to the middle of the screen. """
 
@@ -132,12 +77,33 @@ class Population:
         self.living_ships = alive_ships_num
         return self.all_dead
 
+    def evolve(self):
+        """Performs evolution algorithm steps: selection, crossover and mutation and reassigns Pilots genotypes. """
+
+        # --- Selection ---
+        self.dead_ships_list = self.ships_list[:]
+        # Sort ships by their performance (measured by score)
+        self.dead_ships_list.sort(key=lambda c: c.points_when_died, reverse=True)
+
+        # Assign best scorers to top_ships
+        self.top_ships = self.dead_ships_list[:int(SELECTION_RATE * POPULATION_SIZE)]
+
+        # Top ships are survivors, they go to next generation
+        for i in range(int(SELECTION_RATE * POPULATION_SIZE)):
+            self.ships_list[i] = self.top_ships[i]
+
+        # Generate "children" for the next generation by crossing over randomly chosen parents from top_ships
+        for i in range(int(SELECTION_RATE * POPULATION_SIZE), POPULATION_SIZE):
+
+            new_gen_a, new_gen_b = cross_over(self.top_ships)
+
+            self.ships_list[i].pilot.genotype_a = new_gen_a
+            self.ships_list[i].pilot.genotype_b = new_gen_b
+
 
 class Pilot:
-    """
-    Pilot (or brain) for SpaceShip class. Its genes store information on weights for nerual network that
-    make a decision on next movement of the ship.
-    """
+    """Pilot (or brain) for SpaceShip class. Its genes store information on weights for nerual network that
+    make a decision on next movement of the ship. """
     def __init__(self):
 
         # Random initialization of weights for neural network using two arrays:
@@ -169,21 +135,16 @@ class Pilot:
     def load_best_genes(self):
         """Load best genes from latest saved simulation. """
 
-        # saved file directory defined in settings
+        # Saved file directory defined in settings
         self.genotype_a = np.load(BEST_GEN_A_PATH)
         self.genotype_b = np.load(BEST_GEN_B_PATH)
 
-    def save_genes(self, gen_id):
+    def save_genes(self):
         """Saves pilot's genes to file. """
 
         # Save to files
-        file_a = BEST_GEN_A_PATH
-        file_b = BEST_GEN_B_PATH
-        file_c = r"./generation_logs/gen_no_{}.npy".format(gen_id)
-
-        np.save(file_a, self.genotype_a)
-        np.save(file_b, self.genotype_b)
-        np.save(file_c, np.zeros((1, 1)))
+        np.save(BEST_GEN_A_PATH, self.genotype_a)
+        np.save(BEST_GEN_B_PATH, self.genotype_b)
 
 
 class SpaceShip:
@@ -296,13 +257,6 @@ class Obstacle:
                                          SCREEN_WIDTH - self.gap_x2, self.thickness,
                                          self.color)
 
-    def respawn(self):
-        """Respawn obstacle after going out of the screen. """
-
-        self.gap_x1 = rd.randrange(0, 440, 1)
-        self.gap_x2 = rd.randrange(self.gap_x1 + 100, self.gap_x1 + 200, 1)
-        self.position_y = SCREEN_HEIGHT + OBSTACLE_FREQ
-
     def update(self, delta_time):
         """Move obstacle downwards. """
 
@@ -313,3 +267,10 @@ class Obstacle:
         # If obstacle "below" the screen, respawn
         if self.position_y < 0:
             self.respawn()
+
+    def respawn(self):
+        """Respawn obstacle after going out of the screen. """
+
+        self.gap_x1 = rd.randrange(0, 440, 1)
+        self.gap_x2 = rd.randrange(self.gap_x1 + 100, self.gap_x1 + 200, 1)
+        self.position_y = SCREEN_HEIGHT + OBSTACLE_FREQ
