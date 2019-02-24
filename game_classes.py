@@ -97,10 +97,12 @@ class Population:
         # Generate "children" for the next generation by crossing over randomly chosen parents from top_ships
         for i in range(int(SELECTION_RATE * POPULATION_SIZE), POPULATION_SIZE):
 
-            new_gen_a, new_gen_b = cross_over(self.top_ships)
+            new_gen_a, new_gen_b, new_bias_a, new_bias_b = cross_over(self.top_ships)
 
             self.ships_list[i].pilot.genotype_a = new_gen_a
             self.ships_list[i].pilot.genotype_b = new_gen_b
+            self.ships_list[i].pilot.bias_a = new_bias_a
+            self.ships_list[i].pilot.bias_b = new_bias_b
 
 
 # ------------------------------------------------------------------------------------------------------------------- #
@@ -111,9 +113,12 @@ class Pilot:
 
         # Random initialization of weights for neural network using two arrays:
         self.genotype_a = np.random.randn(NEURONS, 3)  # 1. NN Weights: INPUT -> HIDDEN LAYER
+        self.bias_a = np.random.randn(NEURONS, 1) * 0.2
         self.genotype_b = np.random.randn(3, NEURONS)  # 2. NN Weights: HIDDEN LAYER -> OUTPUT LAYER
+        self.bias_b = np.random.randn(3, 1) * 0.2
 
         self.pilot_score = 0
+        self.fitness = 0
 
     def decide(self, x_ship, gap_x1, gap_x2):
         """
@@ -128,8 +133,8 @@ class Pilot:
         """
 
         input_lay = np.array((x_ship, gap_x1, gap_x2)).reshape(3, 1) / SCREEN_WIDTH
-        hid_lay = relu(np.dot(self.genotype_a, input_lay))
-        output = softmax(relu(np.dot(self.genotype_b, hid_lay)))
+        hid_lay = relu(np.dot(self.genotype_a, input_lay) + self.bias_a)
+        output = softmax(relu(np.dot(self.genotype_b, hid_lay) + self.bias_b))
 
         return np.argmax(output)
 
@@ -137,15 +142,26 @@ class Pilot:
         """Load best genes from latest saved simulation. """
 
         # Saved file directory defined in settings
-        self.genotype_a = np.load(BEST_GEN_A_PATH)
-        self.genotype_b = np.load(BEST_GEN_B_PATH)
 
+        gen_list = np.load(BEST_GEN_PATH)
+
+        self.genotype_a = gen_list[0]
+        self.bias_a = gen_list[1]
+        self.genotype_b = gen_list[2]
+        self.bias_b = gen_list[3]
+
+    # Todo: fix save genes
     def save_genes(self):
         """Saves pilot's genes to file. """
 
+        gen_list = [self.genotype_a, self.bias_a, self.genotype_b, self.bias_b]
+
         # Save to files
-        np.save(BEST_GEN_A_PATH, self.genotype_a)
-        np.save(BEST_GEN_B_PATH, self.genotype_b)
+        np.save(BEST_GEN_PATH, gen_list)
+
+    # Todo: develop calculations for fitness func
+    def calc_fitness(self):
+        pass
 
 
 # ------------------------------------------------------------------------------------------------------------------- #

@@ -37,6 +37,8 @@ def cross_over(top_ships):
     # Crossing genes of parents
     gen_a_new = pilot_1.genotype_a * xoW + (1 - xoW) * pilot_2.genotype_a
     gen_b_new = pilot_1.genotype_b * xoW + (1 - xoW) * pilot_2.genotype_b
+    bias_a_new = pilot_1.bias_a * xoW + (1 - xoW) * pilot_2.bias_a
+    bias_b_new = pilot_1.bias_b * xoW + (1 - xoW) * pilot_2.bias_b
 
     # --- Mutation ---
     # Random choice of mutation weight from range (typically 0.8 - 1.2)
@@ -50,4 +52,4 @@ def cross_over(top_ships):
         gen_a_new = gen_a_new * mutationW
         gen_b_new = gen_b_new * mutationW
 
-    return gen_a_new, gen_b_new
+    return gen_a_new, gen_b_new, bias_a_new, bias_b_new
