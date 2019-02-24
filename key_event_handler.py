@@ -35,7 +35,7 @@ class KeyEventHandler:
                 self.simulation_mode = True
                 self.smart_AI_mode = False
                 self.setup()
-                self.population.restart_sim()
+                self.population.erase_history()
             if key == arcade.key.D:
                 self.current_state = GAME_RUNNING
                 self.AI_mode = True
@@ -66,11 +66,13 @@ class KeyEventHandler:
         # --- SIMULATION MENU BUTTONS --- #
         if self.current_state == SIMULATION_MENU:
             if key == arcade.key.S:
-                self.population.top_ships[0].pilot.save_genes()
+                self.population.break_simulation(self.score,
+                                                 self.obstacle_list[self.closest_obstacle].gap_x1,
+                                                 self.obstacle_list[self.closest_obstacle].gap_x2)
                 self.current_state = MENU
             elif key == arcade.key.SPACE:
                 self.current_state = GAME_RUNNING
-                self.population.restart_sim()
+                self.population.erase_history()
             elif key == arcade.key.ESCAPE:
                 self.current_state = MENU
 

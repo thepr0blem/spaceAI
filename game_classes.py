@@ -11,7 +11,7 @@ import arcade
 import numpy as np
 
 from settings import *
-from ext_functions import softmax, relu, cross_over
+from ext_functions import softmax, relu, cross_over, mutate, amp_func
 
 
 # ------------------------------------------------------------------------------------------------------------------- #
@@ -37,7 +37,7 @@ class Population:
 
         # Population ship lists
         self.ships_list = []
-        self.dead_ships_list = []
+        self.prev_gen_ships_list = []
         self.top_ships = []
 
     def populate(self):
@@ -47,11 +47,11 @@ class Population:
         for i in range(POPULATION_SIZE):
             self.ships_list.append(SpaceShip(320, 50, 0, 15))
 
-    def restart_sim(self):
+    def erase_history(self):
         """Restart population by cleaning ships_list and performing fresh initialization. """
 
         self.ships_list = []
-        self.dead_ships_list = []
+        self.prev_gen_ships_list = []
         self.top_ships = []
         self.generation_id = 0
         self.populate()
@@ -82,12 +82,7 @@ class Population:
         """Performs evolution algorithm steps: selection, crossover and mutation and reassigns Pilots genotypes. """
 
         # --- Selection ---
-        self.dead_ships_list = self.ships_list[:]
-        # Sort ships by their performance (measured by score)
-        self.dead_ships_list.sort(key=lambda c: c.pilot.pilot_score, reverse=True)
-
-        # Assign best scorers to top_ships
-        self.top_ships = self.dead_ships_list[:int(SELECTION_RATE * POPULATION_SIZE)]
+        self.selection()
 
         # --- Evolution ---
         # Top ships are survivors, they go to next generation
@@ -97,12 +92,35 @@ class Population:
         # Generate "children" for the next generation by crossing over randomly chosen parents from top_ships
         for i in range(int(SELECTION_RATE * POPULATION_SIZE), POPULATION_SIZE):
 
-            new_gen_a, new_gen_b, new_bias_a, new_bias_b = cross_over(self.top_ships)
+            new_gen_a, new_gen_b, new_bias_a, new_bias_b = cross_over(rd.choice(self.top_ships).pilot,
+                                                                      rd.choice(self.top_ships).pilot)
+
+            new_gen_a, new_gen_b, new_bias_a, new_bias_b = mutate(new_gen_a, new_gen_b, new_bias_a, new_bias_b)
 
             self.ships_list[i].pilot.genotype_a = new_gen_a
             self.ships_list[i].pilot.genotype_b = new_gen_b
             self.ships_list[i].pilot.bias_a = new_bias_a
             self.ships_list[i].pilot.bias_b = new_bias_b
+
+    def selection(self):
+
+        # --- Selection ---
+        # Sort ships by their performance (measured by pilot's score)
+        self.prev_gen_ships_list = self.ships_list[:]
+        self.prev_gen_ships_list.sort(key=lambda c: c.pilot.fitness, reverse=True)
+
+        # Assign best scorers to top_ships
+        self.top_ships = self.prev_gen_ships_list[:int(SELECTION_RATE * POPULATION_SIZE)]
+
+    def break_simulation(self, points, gap_x1, gap_x2):
+
+        for ship in self.ships_list:
+            ship.pilot.pilot_score = points
+            ship.pilot.calc_fitness(ship.position_x, gap_x1, gap_x2)
+
+        self.selection()
+
+        self.top_ships[0].pilot.save_genes()
 
 
 # ------------------------------------------------------------------------------------------------------------------- #
@@ -112,13 +130,19 @@ class Pilot:
     def __init__(self):
 
         # Random initialization of weights for neural network using two arrays:
-        self.genotype_a = np.random.randn(NEURONS, 3)  # 1. NN Weights: INPUT -> HIDDEN LAYER
-        self.bias_a = np.random.randn(NEURONS, 1) * 0.2
-        self.genotype_b = np.random.randn(3, NEURONS)  # 2. NN Weights: HIDDEN LAYER -> OUTPUT LAYER
-        self.bias_b = np.random.randn(3, 1) * 0.2
+        # Layer 1
+        self.genotype_a = np.random.randn(NEURONS, 3)
+        self.bias_a = np.random.randn(NEURONS, 1) * 0.5
 
+        # Layer 2
+        self.genotype_b = np.random.randn(3, NEURONS)
+        self.bias_b = np.random.randn(3, 1) * 0.5
+
+        # Pilot attributes
         self.pilot_score = 0
         self.fitness = 0
+        self.stay_decs_count = 0
+        self.move_decs_count = 0
 
     def decide(self, x_ship, gap_x1, gap_x2):
         """
@@ -136,7 +160,16 @@ class Pilot:
         hid_lay = relu(np.dot(self.genotype_a, input_lay) + self.bias_a)
         output = softmax(relu(np.dot(self.genotype_b, hid_lay) + self.bias_b))
 
-        return np.argmax(output)
+        decision = np.argmax(output)
+
+        if decision == 0:
+            self.stay_decs_count += 1
+        elif decision == 1:
+            self.move_decs_count += 1
+        elif decision == 2:
+            self.move_decs_count += 1
+
+        return decision
 
     def load_best_genes(self):
         """Load best genes from latest saved simulation. """
@@ -150,7 +183,6 @@ class Pilot:
         self.genotype_b = gen_list[2]
         self.bias_b = gen_list[3]
 
-    # Todo: fix save genes
     def save_genes(self):
         """Saves pilot's genes to file. """
 
@@ -159,9 +191,16 @@ class Pilot:
         # Save to files
         np.save(BEST_GEN_PATH, gen_list)
 
-    # Todo: develop calculations for fitness func
-    def calc_fitness(self):
-        pass
+    def calc_fitness(self, ship_x, gap_x1, gap_x2):
+
+        # Relative part of stay decisions
+        if self.pilot_score > 10:
+            moves_distr_score = self.stay_decs_count / (self.move_decs_count + self.stay_decs_count)
+        else:
+            moves_distr_score = 0
+
+        # self.fitness = float(self.pilot_score) + rel_dist + amp_func(moves_dist)
+        self.fitness = self.pilot_score + amp_func(moves_distr_score, STAY_FRAC)
 
 
 # ------------------------------------------------------------------------------------------------------------------- #
@@ -249,6 +288,7 @@ class Obstacle:
         self.color = arcade.color.ANTI_FLASH_WHITE
         self.is_active = True
         self.is_textured = True
+        self.speed = OBSTACLE_SPEED
 
     def draw(self):
         """Draw space obstacle. """
@@ -280,7 +320,7 @@ class Obstacle:
 
         # Move the obstacle
         if self.is_active:
-            self.position_y -= OBSTACLE_SPEED * delta_time
+            self.position_y -= self.speed * delta_time
 
         # If obstacle "below" the screen, respawn
         if self.position_y < 0:
@@ -292,5 +332,12 @@ class Obstacle:
         self.gap_x1 = rd.randrange(0, 440, 1)
         self.gap_x2 = rd.randrange(self.gap_x1 + 100, self.gap_x1 + 200, 1)
         self.position_y = SCREEN_HEIGHT + OBSTACLE_FREQ
+
+    def level_up(self, score):
+        """Accelerate every 100 points"""
+
+        if score % 100 == 0:
+            self.speed += 50
+
 
 # ------------------------------------------------------------------------------------------------------------------- #

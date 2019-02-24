@@ -19,7 +19,53 @@ def relu(x):
     return np.maximum(0.0, x)
 
 
-def cross_over(top_ships):
+def amp_func(x, stay_frac):
+
+    if 0 < x <= stay_frac:
+        return (1/stay_frac) * x
+    elif 1 >= x > stay_frac:
+        return -(1/(1-stay_frac)) * x + 1/(1-stay_frac)
+    elif x > 1 or x <= 0:
+        return 0
+
+
+def cross_over(pilot_1, pilot_2):
+    """Generate new genoms based on randomly selected ships from n top players from previous generation.
+
+    - cross_over - generate new genotypes based on randomly selected ships from
+        n [POPULATION_SIZE * SELECTION_RATE (see settings)] top players from previous generation.
+        This method applies mutation and crossover steps from evolution algorithm
+    """
+
+    # --- Crossover ---
+    xoW = rd.random()  # Crossover weight
+
+    # Crossing genes of parents
+    gen_a_new = pilot_1.genotype_a * xoW + (1 - xoW) * pilot_2.genotype_a
+    gen_b_new = pilot_1.genotype_b * xoW + (1 - xoW) * pilot_2.genotype_b
+    bias_a_new = pilot_1.bias_a * xoW + (1 - xoW) * pilot_2.bias_a
+    bias_b_new = pilot_1.bias_b * xoW + (1 - xoW) * pilot_2.bias_b
+
+    return gen_a_new, gen_b_new, bias_a_new, bias_b_new
+
+
+def mutate(gen_a_new, gen_b_new, bias_a_new, bias_b_new):
+
+    mutation = rd.random()
+    # Check if mutation happens
+    if mutation <= MUTATION_PROB:
+
+        # Modify whole genes by multiplying their weights with mutation weight
+        gen_a_new = np.random.randn(NEURONS, 3)
+        gen_b_new = np.random.randn(3, NEURONS)
+        bias_a_new = np.random.randn(NEURONS, 1) * 0.5
+        bias_b_new = np.random.randn(3, 1) * 0.5
+
+    return gen_a_new, gen_b_new, bias_a_new, bias_b_new
+
+
+# ------------------------------------------------------------------------------------------------------------------- #
+def cross_over_backup(top_ships):
     """Generate new genoms based on randomly selected ships from n top players from previous generation.
 
     - cross_over - generate new genotypes based on randomly selected ships from
@@ -51,5 +97,7 @@ def cross_over(top_ships):
         # Modify whole genes by multiplying their weights with mutation weight
         gen_a_new = gen_a_new * mutationW
         gen_b_new = gen_b_new * mutationW
+        bias_a_new = bias_a_new * mutationW
+        bias_b_new = bias_b_new * mutationW
 
     return gen_a_new, gen_b_new, bias_a_new, bias_b_new

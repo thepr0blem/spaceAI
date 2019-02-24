@@ -144,7 +144,7 @@ class MyGame(KeyEventHandler, CollisionSystem, Drawer, arcade.Window):
                     if ship.alive:
                         ship.update(ai_state=self.AI_mode,
                                     gap_x1=self.obstacle_list[self.closest_obstacle].gap_x1,
-                                    gap_x2=self.obstacle_list[self.closest_obstacle].gap_x1)
+                                    gap_x2=self.obstacle_list[self.closest_obstacle].gap_x2)
 
                 # Obstacles update
                 for obstacle in self.obstacle_list:
