@@ -14,6 +14,7 @@ from settings import *
 from ext_functions import softmax, relu, cross_over
 
 
+# ------------------------------------------------------------------------------------------------------------------- #
 class Population:
     """
     Collection of SpaceShip objects, which together with their pilots will be evolving as playing
@@ -83,11 +84,12 @@ class Population:
         # --- Selection ---
         self.dead_ships_list = self.ships_list[:]
         # Sort ships by their performance (measured by score)
-        self.dead_ships_list.sort(key=lambda c: c.points_when_died, reverse=True)
+        self.dead_ships_list.sort(key=lambda c: c.pilot.pilot_score, reverse=True)
 
         # Assign best scorers to top_ships
         self.top_ships = self.dead_ships_list[:int(SELECTION_RATE * POPULATION_SIZE)]
 
+        # --- Evolution ---
         # Top ships are survivors, they go to next generation
         for i in range(int(SELECTION_RATE * POPULATION_SIZE)):
             self.ships_list[i] = self.top_ships[i]
@@ -101,18 +103,17 @@ class Population:
             self.ships_list[i].pilot.genotype_b = new_gen_b
 
 
+# ------------------------------------------------------------------------------------------------------------------- #
 class Pilot:
     """Pilot (or brain) for SpaceShip class. Its genes store information on weights for nerual network that
     make a decision on next movement of the ship. """
     def __init__(self):
 
         # Random initialization of weights for neural network using two arrays:
-        # 1. NN Weights: INPUT -> HIDDEN LAYER
-        self.genotype_a = np.random.randn(NEURONS, 3)
-        # 2. NN Weights: HIDDEN LAYER -> OUTPUT LAYER
-        self.genotype_b = np.random.randn(3, NEURONS)
+        self.genotype_a = np.random.randn(NEURONS, 3)  # 1. NN Weights: INPUT -> HIDDEN LAYER
+        self.genotype_b = np.random.randn(3, NEURONS)  # 2. NN Weights: HIDDEN LAYER -> OUTPUT LAYER
 
-        self.latest_score = 0
+        self.pilot_score = 0
 
     def decide(self, x_ship, gap_x1, gap_x2):
         """
@@ -147,6 +148,7 @@ class Pilot:
         np.save(BEST_GEN_B_PATH, self.genotype_b)
 
 
+# ------------------------------------------------------------------------------------------------------------------- #
 class SpaceShip:
     """
     Spaceship game class.
@@ -167,7 +169,6 @@ class SpaceShip:
 
         # In-game params
         self.alive = True
-        self.points_when_died = 0
         self.pilot = Pilot()
 
     def draw(self):
@@ -211,6 +212,7 @@ class SpaceShip:
             self.position_x = SCREEN_WIDTH - self.half_width
 
 
+# ------------------------------------------------------------------------------------------------------------------- #
 class Obstacle:
     """Obstacle game class.
 
@@ -274,3 +276,5 @@ class Obstacle:
         self.gap_x1 = rd.randrange(0, 440, 1)
         self.gap_x2 = rd.randrange(self.gap_x1 + 100, self.gap_x1 + 200, 1)
         self.position_y = SCREEN_HEIGHT + OBSTACLE_FREQ
+
+# ------------------------------------------------------------------------------------------------------------------- #

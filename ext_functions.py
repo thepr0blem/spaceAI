@@ -28,8 +28,7 @@ def cross_over(top_ships):
     """
 
     # --- Crossover ---
-    # Crossover weight
-    xoW = rd.random()
+    xoW = rd.random()  # Crossover weight
 
     # Random choice of two pilots from top ones to take them as parents
     pilot_1 = rd.choice(top_ships).pilot
