@@ -9,12 +9,11 @@ A. Random Autopilot - spaceship is steered by AI with randomly initialized neura
 B. Human Player - spaceship is steered by human player (LEFT and RIGHT arrow keys)
 C. Simulation - in this mode population is generated and evolved until the user decides to stop on current generation
 and save latest genes of most successful pilot to file
-D. Top Pilot - loads genes from previous simulations and initialize intelligent pilot to steer the spaceship
 
 Tips for moving between screens:
-- Game Over Menu is displayed after spaceship dies in modes A, B or D. From Game Over Menu user may go to Main Menu
+- Game Over Menu is displayed after spaceship dies in modes A or B. From Game Over Menu user may go to Main Menu
 or restart current mode.
-- Simulation - press R to go to Simulation Menu. Here you can save latest genes, restart simulation or go to Main Menu
+- Simulation - press R to go to Simulation Menu. Here you can restart simulation or go to Main Menu.
 
 Run this file to turn on the game.
 
@@ -49,7 +48,6 @@ class MyGame(KeyEventHandler, CollisionSystem, Drawer, arcade.Window):
         self.obstacle_list = None
         self.closest_obstacle = None
         self.AI_mode = False
-        self.smart_AI_mode = False
         self.simulation_mode = False
 
         self.current_state = MENU
@@ -66,12 +64,7 @@ class MyGame(KeyEventHandler, CollisionSystem, Drawer, arcade.Window):
             self.population.ressurect_ships()
 
         else:
-            if self.smart_AI_mode:
-                self.ship = SpaceShip(320, 50, 0, 15)
-                self.ship.pilot.load_best_genes()
-
-            else:
-                self.ship = SpaceShip(320, 50, 0, 15)
+            self.ship = SpaceShip(320, 50, 0, 15)
 
         # Score
         self.score = 0
@@ -154,18 +147,18 @@ class MyGame(KeyEventHandler, CollisionSystem, Drawer, arcade.Window):
         else:
             if self.current_state == GAME_RUNNING:
 
-                self.pass_obstacles()  # Passing obstacles
+                self.check_for_collision()
+
+                self.pass_obstacles()
 
                 # Ship update
                 self.ship.update(ai_state=self.AI_mode,
                                  gap_x1=self.obstacle_list[self.closest_obstacle].gap_x1,
-                                 gap_x2=self.obstacle_list[self.closest_obstacle].gap_x1)
+                                 gap_x2=self.obstacle_list[self.closest_obstacle].gap_x2)
 
                 # Obstacles update
                 for obstacle in self.obstacle_list:
                     obstacle.update(delta_time)
-
-                self.check_for_collision()
 
 
 def main():

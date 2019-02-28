@@ -106,21 +106,13 @@ class Population:
 
         # --- Selection ---
         # Sort ships by their performance (measured by pilot's score)
+        self.prev_gen_ships_list = []
         self.prev_gen_ships_list = self.ships_list[:]
         self.prev_gen_ships_list.sort(key=lambda c: c.pilot.fitness, reverse=True)
 
         # Assign best scorers to top_ships
+        self.top_ships = []
         self.top_ships = self.prev_gen_ships_list[:int(SELECTION_RATE * POPULATION_SIZE)]
-
-    def break_simulation(self, points, gap_x1, gap_x2):
-
-        for ship in self.ships_list:
-            ship.pilot.pilot_score = points
-            ship.pilot.calc_fitness(ship.position_x, gap_x1, gap_x2)
-
-        self.selection()
-
-        self.top_ships[0].pilot.save_genes()
 
 
 # ------------------------------------------------------------------------------------------------------------------- #
@@ -171,30 +163,10 @@ class Pilot:
 
         return decision
 
-    def load_best_genes(self):
-        """Load best genes from latest saved simulation. """
-
-        # Saved file directory defined in settings
-
-        gen_list = np.load(BEST_GEN_PATH)
-
-        self.genotype_a = gen_list[0]
-        self.bias_a = gen_list[1]
-        self.genotype_b = gen_list[2]
-        self.bias_b = gen_list[3]
-
-    def save_genes(self):
-        """Saves pilot's genes to file. """
-
-        gen_list = [self.genotype_a, self.bias_a, self.genotype_b, self.bias_b]
-
-        # Save to files
-        np.save(BEST_GEN_PATH, gen_list)
-
-    def calc_fitness(self, ship_x, gap_x1, gap_x2):
+    def calc_fitness(self):
 
         # Relative part of stay decisions
-        if self.pilot_score > 10:
+        if self.pilot_score > 3:
             moves_distr_score = self.stay_decs_count / (self.move_decs_count + self.stay_decs_count)
         else:
             moves_distr_score = 0
@@ -336,7 +308,7 @@ class Obstacle:
     def level_up(self, score):
         """Accelerate every 100 points"""
 
-        if score % 100 == 0:
+        if score % 50 == 0:
             self.speed += 50
 
 

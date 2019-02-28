@@ -32,15 +32,13 @@ class Drawer:
         """Draw MENU screen. """
 
         arcade.draw_rectangle_filled(int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5), 700, 250, arcade.color.BLACK)
-        arcade.draw_text("Choose game mode: ", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) + 90,
+        arcade.draw_text("Choose game mode: ", int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5) + 70,
                          arcade.color.WHITE, 28, align="center", anchor_x="center", anchor_y="center")
-        arcade.draw_text("A. Random Autopilot", 170, 300,
+        arcade.draw_text("A. Random Autopilot", 170, 280,
                          arcade.color.WHITE, 20, anchor_x="left", anchor_y="top")
-        arcade.draw_text("B. Human Player", 170, 260,
+        arcade.draw_text("B. Human Player", 170, 240,
                          arcade.color.WHITE, 20, anchor_x="left", anchor_y="top")
-        arcade.draw_text("C. Simulation", 170, 220,
-                         arcade.color.WHITE, 20, anchor_x="left", anchor_y="top")
-        arcade.draw_text("D. Top Pilot", 170, 180,
+        arcade.draw_text("C. Simulation", 170, 200,
                          arcade.color.WHITE, 20, anchor_x="left", anchor_y="top")
 
     def draw_game_over(self, points):
@@ -68,13 +66,11 @@ class Drawer:
         """Displays SIMULATION menu on the screen. """
 
         arcade.draw_rectangle_filled(int(SCREEN_WIDTH * 0.5), int(SCREEN_HEIGHT * 0.5), 700, 250, arcade.color.BLACK)
-        arcade.draw_text("Simulation MENU:", 30, 350,
+        arcade.draw_text("Simulation MENU:", 30, 310,
                          arcade.color.WHITE, 28, anchor_x="left", anchor_y="top")
-        arcade.draw_text("1. SPACE to restart simulation", 30, 300,
+        arcade.draw_text("1. SPACE to restart simulation", 30, 260,
                          arcade.color.WHITE, 18, anchor_x="left", anchor_y="top")
-        arcade.draw_text("2. S to save best genes from latest generation", 30, 260,
-                         arcade.color.WHITE, 18, anchor_x="left", anchor_y="top")
-        arcade.draw_text("3. Click ESC to leave to MAIN menu", 30, 220,
+        arcade.draw_text("2. Click ESC to leave to MAIN menu", 30, 220,
                          arcade.color.WHITE, 18, anchor_x="left", anchor_y="top")
 
     def draw_bottom_bar(self, score, simulation_mode, gen_id, living_ships, gap_x1, gap_x2, pos_y):

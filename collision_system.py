@@ -23,7 +23,7 @@ class CollisionSystem:
                         if ship.center_y >= clo_obst_bot_edge:
                             ship.alive = False
                             ship.pilot.pilot_score = self.score
-                            ship.pilot.calc_fitness(ship_x=ship.position_x, gap_x1=clo_obst_x1, gap_x2=clo_obst_x2)
+                            ship.pilot.calc_fitness()
 
         # --- COLLISIONS IN SINGLE SHIP MODE ---
         else:
