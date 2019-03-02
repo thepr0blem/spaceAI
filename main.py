@@ -4,7 +4,7 @@
 The main purpose of this exercise is to build a simple "space runner" game which will be an environment
 for genetic algorithm implementation.
 
-The game has 4 modes:
+The game has 3 modes:
 A. Random Autopilot - spaceship is steered by AI with randomly initialized neural network
 B. Human Player - spaceship is steered by human player (LEFT and RIGHT arrow keys)
 C. Simulation - in this mode population is generated and evolved until the user decides to stop on current generation

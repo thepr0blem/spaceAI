@@ -11,7 +11,7 @@ import arcade
 import numpy as np
 
 from settings import *
-from ext_functions import softmax, relu, cross_over, mutate, amp_func
+from ext_functions import softmax, relu, cross_over, mutate, add_score
 
 
 # ------------------------------------------------------------------------------------------------------------------- #
@@ -21,11 +21,12 @@ class Population:
 
     Methods:
         - populate - generates collection of POPULATION_SIZE ships
-        - restart_sim - restars population by cleaning ships_list and performing fresh initialization
+        - erase_history - restars population by cleaning ships_list and performing fresh initialization
         - evolve - performs evolution algorithm steps: selection, crossover and mutation and reassigns Pilots genotypes
-        - save_best_genes - saves genes of latest top scorer to file
         - ressurect_ships - resurrects all ships in population and reposition them to the middle of the screen
         - check_if_all_dead - returns TRUE if all ships are dead
+        - evolve - performs population evolution
+        - selection - sorts pilots by their fitness
     """
 
     def __init__(self):
@@ -166,8 +167,9 @@ class Pilot:
 
     def calc_fitness(self):
         """
-        Calculates pilot's fitness based on his current score and proportion of stay decisions to total decisions.
-        The latter is the tweak implemented to eliminate ships which perform well, but do many neccessary movements.
+        - Calculates pilot's fitness based on his current score and proportion of 'stay' decisions to total decisions.
+        - The latter is the tweak implemented to eliminate ships which perform well, but do many neccessary movements.
+        Additional points are granted when ships have scored > 3 points.
         """
 
         # Relative part of stay decisions
@@ -176,8 +178,7 @@ class Pilot:
         else:
             moves_distr_score = 0
 
-        # self.fitness = float(self.pilot_score) + rel_dist + amp_func(moves_dist)
-        self.fitness = self.pilot_score + amp_func(moves_distr_score, STAY_FRAC)
+        self.fitness = self.pilot_score + add_score(moves_distr_score, STAY_FRAC)
 
 
 # ------------------------------------------------------------------------------------------------------------------- #
@@ -252,6 +253,7 @@ class Obstacle:
     - draw - draws space obstacle
     - respawn - respawn obstacle "above" the visibile screen area after passing by the spaceship y position
     - update - updates current state of obstacle (moves obstacle down the screen)
+    - level_up - increase obstacle vertical movement every x points
     """
     def __init__(self, position_y):
 

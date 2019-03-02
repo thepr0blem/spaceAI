@@ -21,7 +21,7 @@ def relu(x):
     return np.maximum(0.0, x)
 
 
-def amp_func(x, stay_frac):
+def add_score(x, stay_frac):
     """
     - Calculates additional score for "stay" decisions being a certain fraction of all decisions made by the pilot.
     - Helps pilots to evolve to a state when they do not make unneccessary movements when going straight.
@@ -37,7 +37,7 @@ def amp_func(x, stay_frac):
 
 def cross_over(pilot_1, pilot_2):
     """
-    Cross genoms of two pilots to produce child gens using the following formula:
+    Cross genoms of two pilots to produce child genes using the following formula:
     new = parent_1 * random + parent_2 * (1 - random), where random is number in range 0-1
     """
 

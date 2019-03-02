@@ -3,6 +3,10 @@ from settings import *
 
 class CollisionSystem:
 
+    """
+    Helper class - collection of methods used to track collisions between ship/population of ships and closest obstacle
+    """
+
     def check_for_collision(self):
         """Checks for collision between ship / population of ships and closest obstacle. """
 
