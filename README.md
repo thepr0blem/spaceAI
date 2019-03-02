@@ -60,20 +60,20 @@ The simulation will randomly initialize population of N Spaceships with randomly
 To evaluate each individual we simply take the number of points gathered during single game. Given the simple rules of the game, the number of passed obstacles is the SCORE.
 
 ```python
-    def calc_fitness(self):
-        """
-        - Calculates pilot's fitness based on his current score and proportion of 'stay' decisions to total decisions.
-        - The latter is the tweak implemented to eliminate ships which perform well, but do many neccessary movements.
-        Additional points are granted when ships have scored > 3 points. 
-        """
+def calc_fitness(self):
+    """
+    - Calculates pilot's fitness based on his current score and proportion of 'stay' decisions to total decisions
+    - The latter is the tweak implemented to eliminate ships which perform well, but do many neccessary movements
+    Additional points are granted when ships have scored > 3 points. 
+    """
 
-        # Relative part of stay decisions
-        if self.pilot_score > 3:
-            moves_distr_score = self.stay_decs_count / (self.move_decs_count + self.stay_decs_count)
-        else:
-            moves_distr_score = 0
+    # Relative part of stay decisions
+    if self.pilot_score > 3:
+        moves_distr_score = self.stay_decs_count / (self.move_decs_count + self.stay_decs_count)
+    else:
+        moves_distr_score = 0
 
-        self.fitness = self.pilot_score + amp_func(moves_distr_score, STAY_FRAC)
+    self.fitness = self.pilot_score + amp_func(moves_distr_score, STAY_FRAC)
 ```
 
 Additional ```amp_func``` function translates fraction of "Stay" decisions to premium fitness points. 
@@ -82,8 +82,8 @@ Additional ```amp_func``` function translates fraction of "Stay" decisions to pr
 
 def amp_func(x, stay_frac):
     """
-    - Calculates additional score for "stay" decisions being a certain fraction of all decisions made by the pilot.
-    - Helps pilots to evolve to a state when they do not make unneccessary movements when going straight.
+    - Calculates additional score for "stay" decisions being a certain fraction of all decisions made by the pilot
+    - Helps pilots to evolve to a state when they do not make unneccessary movements when going straight
     """
 
     if 0 < x <= stay_frac:
