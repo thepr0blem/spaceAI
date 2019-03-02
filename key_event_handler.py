@@ -3,6 +3,9 @@ from settings import *
 
 
 class KeyEventHandler:
+    """
+    Helper class - collection of methoded used to track keyboard presses and handling respective actions
+    """
 
     def on_key_release(self, key, modifiers):
         """ Called whenever a user releases a key. """

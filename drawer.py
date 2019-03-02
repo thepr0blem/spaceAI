@@ -3,6 +3,13 @@ from settings import *
 
 
 class Drawer:
+    """
+    Helper class - collection of method used by MyGame class to draw different possible scenarios, like:
+    - current game state
+    - menu screens
+    - game over screen
+    - bottom bar with score/additional information
+    """
 
     def draw_game(self):
         """Draws game on the screen, including:

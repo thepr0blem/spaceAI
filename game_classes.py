@@ -79,7 +79,7 @@ class Population:
         return self.all_dead
 
     def evolve(self):
-        """Performs evolution algorithm steps: selection, crossover and mutation and reassigns Pilots genotypes. """
+        """Performs evolution algorithm steps: selection, crossover and mutation and reassigns Pilots' genotypes. """
 
         # --- Selection ---
         self.selection()
@@ -103,6 +103,7 @@ class Population:
             self.ships_list[i].pilot.bias_b = new_bias_b
 
     def selection(self):
+        """Sorts pilots by their fitness and assigns the best units to top_ships variable"""
 
         # --- Selection ---
         # Sort ships by their performance (measured by pilot's score)
@@ -164,6 +165,10 @@ class Pilot:
         return decision
 
     def calc_fitness(self):
+        """
+        Calculates pilot's fitness based on his current score and proportion of stay decisions to total decisions.
+        The latter is the tweak implemented to eliminate ships which perform well, but do many neccessary movements.
+        """
 
         # Relative part of stay decisions
         if self.pilot_score > 3:

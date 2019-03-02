@@ -1,4 +1,6 @@
-"""Helper functions for neural network implementation. """
+"""
+Helper functions used in neural network implementation and evolving of population
+"""
 import numpy as np
 import random as rd
 from settings import *
@@ -6,7 +8,7 @@ from settings import *
 
 def softmax(x):
     """
-    Compute softmax values for each sets of scores in x.
+    Computes softmax values for each sets of scores in x.
     Input: x - list of n numbers
     Returns: Numpy array with softmax distribution and n elements
     """
@@ -20,6 +22,10 @@ def relu(x):
 
 
 def amp_func(x, stay_frac):
+    """
+    - Calculates additional score for "stay" decisions being a certain fraction of all decisions made by the pilot.
+    - Helps pilots to evolve to a state when they do not make unneccessary movements when going straight.
+    """
 
     if 0 < x <= stay_frac:
         return (1/stay_frac) * x
@@ -30,11 +36,9 @@ def amp_func(x, stay_frac):
 
 
 def cross_over(pilot_1, pilot_2):
-    """Generate new genoms based on randomly selected ships from n top players from previous generation.
-
-    - cross_over - generate new genotypes based on randomly selected ships from
-        n [POPULATION_SIZE * SELECTION_RATE (see settings)] top players from previous generation.
-        This method applies mutation and crossover steps from evolution algorithm
+    """
+    Cross genoms of two pilots to produce child gens using the following formula:
+    new = parent_1 * random + parent_2 * (1 - random), where random is number in range 0-1
     """
 
     # --- Crossover ---
@@ -50,6 +54,9 @@ def cross_over(pilot_1, pilot_2):
 
 
 def mutate(gen_a_new, gen_b_new, bias_a_new, bias_b_new):
+    """
+    Mutates genes by replacing with random numbers with probability of MUTATION_PROB (modified in settings.py)
+    """
 
     mutation = rd.random()
     # Check if mutation happens
