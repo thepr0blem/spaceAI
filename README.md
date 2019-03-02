@@ -245,7 +245,7 @@ The MyGame class has more methods which are inherited from helper classes. Namel
 
 ```game_classes.py``` contains classes for in game objects, such as: 
 
-#### 3.3.6.1 Population - 
+#### 3.3.6.1 Population
 Collection of SpaceShip objects, which together with their pilots will be evolving as playing. Methods:
 - populate - generates collection of POPULATION_SIZE ships
 - erase_history - restars population by cleaning ships_list and performing fresh initialization
