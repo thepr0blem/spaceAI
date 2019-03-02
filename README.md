@@ -76,14 +76,13 @@ def calc_fitness(self):
     self.fitness = self.pilot_score + amp_func(moves_distr_score, STAY_FRAC)
 ```
 
-Additional ```amp_func``` function translates fraction of "Stay" decisions to premium fitness points. 
+Additional ```add_score``` function translates fraction of "Stay" decisions to premium fitness points. 
 
 ```python
-
-def amp_func(x, stay_frac):
+def add_score(x, stay_frac):
     """
-    - Calculates additional score for "stay" decisions being a certain fraction of all decisions made by the pilot
-    - Helps pilots to evolve to a state when they do not make unneccessary movements when going straight
+    - Calculates additional score for "stay" decisions being a certain fraction of all decisions made by the pilot.
+    - Helps pilots to evolve to a state when they do not make unneccessary movements when going straight.
     """
 
     if 0 < x <= stay_frac:
@@ -92,7 +91,6 @@ def amp_func(x, stay_frac):
         return -(1/(1-stay_frac)) * x + 1/(1-stay_frac)
     elif x > 1 or x <= 0:
         return 0
-
 ```
 
 #### 2.2.2. Selection
@@ -106,19 +104,18 @@ Selection step works as follows:
 - move top n top scorers directly to next generation 
 
 ```python
+def selection(self):
+    """Sorts pilots by their fitness and assigns the best units to top_ships variable"""
 
-    def selection(self):
-        """Sorts pilots by their fitness and assigns the best units to top_ships variable"""
+    # --- Selection ---
+    # Sort ships by their performance (measured by pilot's score)
+    self.prev_gen_ships_list = []
+    self.prev_gen_ships_list = self.ships_list[:]
+    self.prev_gen_ships_list.sort(key=lambda c: c.pilot.fitness, reverse=True)
 
-        # --- Selection ---
-        # Sort ships by their performance (measured by pilot's score)
-        self.prev_gen_ships_list = []
-        self.prev_gen_ships_list = self.ships_list[:]
-        self.prev_gen_ships_list.sort(key=lambda c: c.pilot.fitness, reverse=True)
-
-        # Assign best scorers to top_ships
-        self.top_ships = []
-        self.top_ships = self.prev_gen_ships_list[:int(SELECTION_RATE * POPULATION_SIZE)]
+    # Assign best scorers to top_ships
+    self.top_ships = []
+    self.top_ships = self.prev_gen_ships_list[:int(SELECTION_RATE * POPULATION_SIZE)]
 
 ```
 
@@ -164,7 +161,6 @@ def mutate(gen_a_new, gen_b_new, bias_a_new, bias_b_new):
         bias_b_new = np.random.randn(3, 1) * 0.5
 
     return gen_a_new, gen_b_new, bias_a_new, bias_b_new
-
 ```
 
 
@@ -201,9 +197,84 @@ In this mode population is generated and evolved.
 <img src="https://github.com/thepr0blem/spaceAI/blob/master/images/scr_2.png" width="500">
 
 
-### 3.3. Classes and logic
+### 3.3. Game logic, structure and classes 
 
-TO DO 
+#### 3.3.1 Overview
+
+The game has been created using ```arcade``` framework. To turn on the game run ```main.py``` script which contains MyGame class. 
+
+#### 3.3.2. MyGame class
+
+```MyGame``` class (```main.py```)is responsible for displaying the game window on the screen, drawing the content and updating screen/game state. It inherits from multiple classess where the most important is ```arcade.Window``` class and the others are helper classes responsible for handling key press events, drawing menu screens and tracking the collisions. The class has 3 important methods: 
+- setup - to set up the game
+- on_draw - called to draw the window
+- update - updates current state of the game 
+
+#### 3.3.3. Helper classes
+
+The MyGame class has more methods which are inherited from helper classes. Namely: 
+- ```collision_system.py``` contains ```CollisionSystem``` class - collection of methods used to track collisions between ship/population of ships and closest obstacle
+- ```key_event_handler.py``` contains ```KeyEventHandler``` class -  collection of methoded used to track keyboard presses and handling respective actions
+- ```drawer.py``` contains ```Drawer``` class -  collection of method used by MyGame class to draw different possible scenarios, like:
+    - current game state
+    - menu screens
+    - game over screen
+    - bottom bar with score/additional information
+
+#### 3.3.4. Helper functions 
+
+```ext_functions.py``` contains helper functions used in neural network implementation and evolving of population. Functions:
+```softmax``` - computes softmax values for each sets of scores in vector x
+```relu``` - neural network activation function - Rectified Linear Unit
+```add_score``` - calculates additional score for "stay" decisions being a certain fraction of all decisions made by the pilot
+```cross_over``` - cross genoms of two pilots to produce child genes
+```mutate``` - mutates genes by replacing with random numbers with probability of MUTATION_PROB (modified in settings.py)
+
+#### 3.3.5. Settings 
+
+```settings.py``` contains overall game settings and evolution parameters such as: 
+- screen width and height 
+- obstacle vertical speed
+- ship horizontal speed 
+- population size
+- mutation probability
+- selection rate (% of ships taken as top scorers) 
+- number of neurons in NN hidden layer
+
+#### 3.3.6. Game classes
+
+```game_classes.py``` contains classes for in game objects, such as: 
+
+- Population - collection of SpaceShip objects, which together with their pilots will be evolving as playing
+
+    Methods:
+        - populate - generates collection of POPULATION_SIZE ships
+        - erase_history - restars population by cleaning ships_list and performing fresh initialization
+        - evolve - performs evolution algorithm steps: selection, crossover and mutation and reassigns Pilots genotypes
+        - ressurect_ships - resurrects all ships in population and reposition them to the middle of the screen
+        - check_if_all_dead - returns TRUE if all ships are dead
+        - evolve - performs population evolution
+        - selection - sorts pilots by their fitness
+        
+- Pilot - brain for SpaceShip class. Its genes store information on weights for nerual network that make a decision on next movement of the ship 
+
+    Methods:
+        - decide - making decision on which direction ship moves using neural network
+        - calc_fitness - calculates pilot's fitness based on his current score and proportion of 'stay' decisions to total decisions
+
+- SpaceShip - spaceship 
+
+    Methods: 
+        - draw - draws the spaceship
+        - update - updates current state of spaceship e.g. position
+    
+- Obstacle - obstacle
+
+    Methods:
+        - draw - draws space obstacle
+        - respawn - respawn obstacle "above" the visibile screen area after passing by the spaceship y position
+        - update - updates current state of obstacle (moves obstacle down the screen)
+        - level_up - increase obstacle vertical movement every x points
 
 ## 4. Potential next steps/ideas 
 I. Test different NN architectures (e.g. variable number of layers) 
@@ -217,3 +288,4 @@ Graphics:
 
 Reference documents: 
 - [Genetic Algorithm Wikipedia page](https://en.wikipedia.org/wiki/Genetic_algorithm)
+- ```arcade``` - [arcade.academy](http://arcade.academy/)
