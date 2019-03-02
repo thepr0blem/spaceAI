@@ -1,6 +1,8 @@
 # spaceAI
 
-Simple space runner implementation in Python Arcade + AI player with neural network trained using genetic algorithm.
+Simple space runner implementation in Python Arcade + AI player with neural network trained using genetic algorithm
+
+<img src="https://github.com/thepr0blem/spaceAI/blob/master/images/scr_1.PNG" width="500">
 
 ### Content of this document 
 1. Introduction
