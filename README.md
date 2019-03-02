@@ -245,36 +245,32 @@ The MyGame class has more methods which are inherited from helper classes. Namel
 
 ```game_classes.py``` contains classes for in game objects, such as: 
 
-- Population - collection of SpaceShip objects, which together with their pilots will be evolving as playing
-
-    Methods:
-        - populate - generates collection of POPULATION_SIZE ships
-        - erase_history - restars population by cleaning ships_list and performing fresh initialization
-        - evolve - performs evolution algorithm steps: selection, crossover and mutation and reassigns Pilots genotypes
-        - ressurect_ships - resurrects all ships in population and reposition them to the middle of the screen
-        - check_if_all_dead - returns TRUE if all ships are dead
-        - evolve - performs population evolution
-        - selection - sorts pilots by their fitness
+#### 3.3.6.1 Population - 
+Collection of SpaceShip objects, which together with their pilots will be evolving as playing. Methods:
+- populate - generates collection of POPULATION_SIZE ships
+- erase_history - restars population by cleaning ships_list and performing fresh initialization
+- evolve - performs evolution algorithm steps: selection, crossover and mutation and reassigns Pilots genotypes
+- ressurect_ships - resurrects all ships in population and reposition them to the middle of the screen
+- check_if_all_dead - returns TRUE if all ships are dead
+- evolve - performs population evolution
+- selection - sorts pilots by their fitness
         
-- Pilot - brain for SpaceShip class. Its genes store information on weights for nerual network that make a decision on next movement of the ship 
+#### 3.3.6.2 Pilot
+Brain for SpaceShip class. Its genes store information on weights for nerual network that make a decision on next movement of the ship Methods:
+- decide - making decision on which direction ship moves using neural network
+- calc_fitness - calculates pilot's fitness based on his current score and proportion of 'stay' decisions to total decisions
 
-    Methods:
-        - decide - making decision on which direction ship moves using neural network
-        - calc_fitness - calculates pilot's fitness based on his current score and proportion of 'stay' decisions to total decisions
-
-- SpaceShip - spaceship 
-
-    Methods: 
-        - draw - draws the spaceship
-        - update - updates current state of spaceship e.g. position
+#### 3.3.6.3 SpaceShip
+Methods: 
+- draw - draws the spaceship
+- update - updates current state of spaceship e.g. position
     
-- Obstacle - obstacle
-
-    Methods:
-        - draw - draws space obstacle
-        - respawn - respawn obstacle "above" the visibile screen area after passing by the spaceship y position
-        - update - updates current state of obstacle (moves obstacle down the screen)
-        - level_up - increase obstacle vertical movement every x points
+#### 3.3.6.4 Obstacle
+Methods:
+- draw - draws space obstacle
+- respawn - respawn obstacle "above" the visibile screen area after passing by the spaceship y position
+- update - updates current state of obstacle (moves obstacle down the screen)
+- level_up - increase obstacle vertical movement every x points
 
 ## 4. Potential next steps/ideas 
 I. Test different NN architectures (e.g. variable number of layers) 
